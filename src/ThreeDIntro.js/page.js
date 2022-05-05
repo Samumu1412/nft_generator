@@ -34,7 +34,7 @@ export const ThreeData = () => {
   return (
     <div style={{ backgroundColor: "#000" }}>
       <div>
-        <div style={{ zIndex: 3 }}>
+        <div>
           <NavHomePage
             setAboutOpen={setAboutOpen}
             setContactOpen={setContactOpen}
@@ -78,7 +78,7 @@ export const ThreeData = () => {
             className="glitch"
             style={{
               zIndex: 3,
-              marginTop: "18vh",
+              marginTop: "8vh",
               color: "#000",
             }}
           >
@@ -88,16 +88,29 @@ export const ThreeData = () => {
           </p>
         </div>
 
-        <div className="title" style={{ zIndex: 3, fontFamily: "monospace" }}>
-          <h3
-            style={{
-              zIndex: 3,
-              fontFamily: "monospace",
-              fontSize: "30px",
-            }}
-          >
-            NFT GENERATOR
-          </h3>
+
+        <div className="description-container" style={{
+          zIndex: 3,
+          marginTop: "3vh"
+        }}>
+          <h2 className="description-header">
+            Tool PASS
+          </h2>
+          <div style={{ 
+            flexDirection: "row",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}>
+            <p className="description-text">
+              Be one of 10,000 people to get access to the collector side of web3's most popular tool.
+            </p>
+            <img
+              src={require("./ToolPass.png")}
+              alt="toolpass"
+              style={{ zIndex: 3, width: '300px', marginRight: '20px' }}
+            />
+          </div>
         </div>
 
         <button
@@ -107,21 +120,7 @@ export const ThreeData = () => {
         >
           Enter
         </button>
-        <div style={{ zIndex: 3, display: "flex", justifyContent: "center" }}>
-          <p
-            className="homepageContent"
-            style={{
-              marginTop: "49vh",
-              bottom: "0",
-              zIndex: 3,
-              fontFamily: "monospace",
-              fontWeight: "400",
-              animation: "glow 2s ease-in-out infinite alternate",
-            }}
-          >
-            A tool to take the pain of creating NFTs away from you.
-          </p>
-        </div>
+
         <img
           src={require("./background.jpg")}
           alt="AlienImage"

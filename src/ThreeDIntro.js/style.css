@@ -110,12 +110,12 @@ html,body {
   }
 
   .glitch {
-    font-size: 5rem;
+    font-size: 6rem;
     font-weight: bold;
     text-transform: uppercase;
     position: relative;
-    text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff,
-      0.025em 0.04em 0 #fffc00;
+    text-shadow: 0.05em 0 0 #d5ebeb, -0.03em -0.04em 0 #374776,
+      0.025em 0.04em 0 #0d0d09;
     animation: glitch 725ms infinite;
   }
 
@@ -149,32 +149,64 @@ html,body {
   
   @keyframes glitch {
     0% {
-      text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff,
-        0.025em 0.04em 0 #fffc00;
+      text-shadow: 0.05em 0 0 #d5ebeb, -0.03em -0.04em 0 #374776,
+        0.025em 0.04em 0 #0d0d09;
     }
     15% {
-      text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff,
-        0.025em 0.04em 0 #fffc00;
+      text-shadow: 0.05em 0 0 #d5ebeb, -0.03em -0.04em 0 #374776,
+        0.025em 0.04em 0 #0d0d09;
     }
     16% {
-      text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff,
-        -0.05em -0.05em 0 #fffc00;
+      text-shadow: -0.05em -0.025em 0 #d5ebeb, 0.025em 0.035em 0 #374776,
+        -0.05em -0.05em 0 #0d0d09;
     }
     49% {
-      text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff,
-        -0.05em -0.05em 0 #fffc00;
+      text-shadow: -0.05em -0.025em 0 #d5ebeb, 0.025em 0.035em 0 #374776,
+        -0.05em -0.05em 0 #0d0d09;
     }
     50% {
-      text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff,
-        0 -0.04em 0 #fffc00;
+      text-shadow: 0.05em 0.035em 0 #d5ebeb, 0.03em 0 0 #374776,
+        0 -0.04em 0 #0d0d09;
     }
     99% {
-      text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff,
-        0 -0.04em 0 #fffc00;
+      text-shadow: 0.05em 0.035em 0 #d5ebeb, 0.03em 0 0 #374776,
+        0 -0.04em 0 #0d0d09;
     }
     100% {
-      text-shadow: -0.05em 0 0 #00fffc, -0.025em -0.04em 0 #fc00ff,
-        -0.04em -0.025em 0 #fffc00;
+      text-shadow: -0.05em 0 0 #d5ebeb, -0.025em -0.04em 0 #374776,
+        -0.04em -0.025em 0 #0d0d09;
     }
-  }  
-  
+  } 
+
+.description-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+  background-color: black;
+  width: 600px;
+  height: 300px;
+  position: relative;
+  padding: 20px;
+  margin: auto;
+  border-radius: 10px;
+}
+
+.description-text {
+  bottom: 0px;
+  z-index: 3;
+  font-family: monospace;
+  font-weight: 400;
+  animation: 2s ease-in-out 0s infinite alternate none running glow;
+  font-size: 15px;
+  color: #fff;
+  font-style: normal;
+}
+
+.description-header {
+  z-index: 3;
+  font-family: monospace;
+  font-size: 30px;
+  color: white;
+  animation: 2s ease-in-out 0s infinite alternate none running glow;
+}

@@ -6,6 +6,8 @@ import {
   Link,
   Routes,
 } from "react-router-dom";
+import { Web3ReactProvider } from '@web3-react/core'
+import { Web3Provider } from '@ethersproject/providers'
 
 import { EditingPage } from "./EditingPage/EditingPage";
 import { Error } from "./ErrorPage/Error.js";
@@ -27,4 +29,18 @@ export const Webpages = () => {
     </Router>
   );
 };
-export default Webpages;
+
+function getLibrary(provider) {
+  const library = new Web3Provider(provider)
+  library.pollingInterval = 12000
+  return library
+}
+
+function WebPagesWithProvider() {
+  return (
+    <Web3ReactProvider getLibrary={getLibrary}>
+      <Webpages />
+    </Web3ReactProvider>
+  )
+}
+export default WebPagesWithProvider;

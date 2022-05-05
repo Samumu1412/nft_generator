@@ -60,7 +60,7 @@ export const NavHomePage = (props) => {
               props.setContactOpen(true);
             }}
           >
-            CONTACT
+            ROADMAP
           </Typography>
         </div>
 
@@ -74,7 +74,7 @@ export const NavHomePage = (props) => {
               props.setAboutOpen(true);
             }}
           >
-            ABOUT US
+            FAQ
           </Typography>
         </div>
       </Toolbar>
