@@ -38,7 +38,7 @@ export const AboutModalComponent = (props) => {
             {map(members, (member, index) => (
               <div className="row" key={member} style={{ padding: 10 }}>
                 <img
-                  src={require(`./avatar${index+1}.png`)}
+                  src={require(`../Assets/avatar${index+1}.png`)}
                   alt="toolpass"
                   style={{
                     zIndex: 3,

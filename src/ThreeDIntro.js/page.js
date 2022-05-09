@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useWeb3React } from '@web3-react/core'
 import { InjectedConnector } from '@web3-react/injected-connector'
 import { ethers } from 'ethers'
-import { get } from 'lodash'
+import { get, map } from 'lodash'
 
 import { NavHomePage } from "./navigationBar";
 import "./style.css";
@@ -12,6 +12,16 @@ import { AboutModalComponent } from "./AboutModal";
 import { RoadmapModalComponent } from "./ContactModal";
 import { FAQModalComponent } from "./InstructionsModal";
 import toolPassABI from '../ABI/toolPassABI.json'
+
+const passTypes = [
+  'ToolPass',
+  'GamePass'
+]
+
+const passIntro = {
+  ToolPass: "Be one of 10,000 people to get access to the collector side of web3's most popular tool.",
+  GamePass: "Play Game with ..................."
+}
 
 const toolPassContractAddress = '0x44Aa52d9F0aD68867eC52C5c4d11CB6E1aF8a8CA'
 
@@ -88,30 +98,6 @@ export const ThreeData = () => {
           />
         </div>
 
-        {/* <div className="title" style={{ zIndex: 3, marginTop: "3vh" }}>
-          <h3
-            style={{
-              zIndex: 3,
-              fontFamily: "monospace",
-              marginLeft: "80vw",
-              backgroundColor: "#3d3d3d48",
-              padding: "5px",
-              borderRadius: "10px",
-            }}
-          >{`Total Users: ${data.TotalUsers}`}</h3>
-          <h3
-            style={{
-              zIndex: 3,
-              fontFamily: "monospace",
-              marginLeft: "80vw",
-              marginTop: "5px",
-              backgroundColor: "#3d3d3d48",
-              padding: "5px",
-              borderRadius: "10px",
-            }}
-          >{`Total Items: ${data.TotalItems}`}</h3>
-        </div> */}
-
         <div
           style={{
             zIndex: 3,
@@ -130,38 +116,58 @@ export const ThreeData = () => {
             Neo Base
           </p>
         </div>
+        <div className="row">
+          {map(passTypes, type => (
+            <div className="description-container" style={{
+              zIndex: 3,
+              marginTop: '4vh'
+            }}>
+              <h2 className="description-header">
+                {type}
+              </h2>
+              <div className="row" style={{ flexWrap: 'nowrap' }}>
+                <p className="description-text">
+                  {passIntro[type]}
+                </p>
+                <img
+                  src={require(`../Assets/${type}.png`)}
+                  alt="toolpass"
+                  style={{ zIndex: 3, width: '300px', marginRight: '20px' }}
+                />
+              </div>
+              {get(userInfo, 'isToolPassOwner') && (
+                <button
+                  className="transparent-button"
+                  style={{ zIndex: 3, fontFamily: "monospace" }}
+                  onClick={handleClick}
+                >
+                  Enter
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
 
-
-        <div className="description-container" style={{
-          zIndex: 3,
-          marginTop: "20vh"
-        }}>
-          <h2 className="description-header">
-            Tool PASS
-          </h2>
-          <div className="row">
-            <p className="description-text">
-              Be one of 10,000 people to get access to the collector side of web3's most popular tool.
-            </p>
-            <img
-              src={require("./ToolPass.png")}
-              alt="toolpass"
-              style={{ zIndex: 3, width: '300px', marginRight: '20px' }}
-            />
+        <div
+          className="row" 
+          style={{
+            justifyContent: 'space-between',
+            width: '100%',
+            position: 'absolute',
+            padding: 10,
+            bottom: 0
+          }}
+        >
+          <div className="description-text" style={{ fontSize: 24 }}>
+            <div>© 2022 Neo Base</div>
           </div>
-          {get(userInfo, 'isToolPassOwner') && (
-            <button
-              className="transparent-button"
-              style={{ zIndex: 3, fontFamily: "monospace" }}
-              onClick={handleClick}
-            >
-              Enter
-            </button>
-          )}
+          <div className="description-text" style={{ fontSize: 24 }}>
+            <div>Privacy Policy</div>
+          </div>
         </div>
 
         <img
-          src={require("./background.jpg")}
+          src={require("../Assets/background.jpg")}
           alt="backgroundImage"
           className="imageBackground"
           style={{ zIndex: 2 }}
