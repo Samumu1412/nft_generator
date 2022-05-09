@@ -19,7 +19,7 @@ const style = {
   backgroundColor: "#525050d7",
 };
 
-export const ContactModalComponent = (props) => {
+export const RoadmapModalComponent = (props) => {
   return (
     <div>
       <Modal
