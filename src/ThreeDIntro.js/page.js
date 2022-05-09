@@ -7,7 +7,7 @@ import { ethers } from 'ethers'
 import { get, map } from 'lodash'
 
 import { NavHomePage } from "./navigationBar";
-import "./style.css";
+import "../style.css";
 import { AboutModalComponent } from "./AboutModal";
 import { RoadmapModalComponent } from "./ContactModal";
 import { FAQModalComponent } from "./InstructionsModal";

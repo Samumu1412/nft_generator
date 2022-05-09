@@ -3,7 +3,7 @@ import { Backdrop } from "@material-ui/core";
 import { Box } from "@material-ui/core";
 import { Modal } from "@material-ui/core";
 import { Fade } from "@material-ui/core";
-import "./style.css"
+import "../style.css"
 import { map } from "lodash";
 
 const members = [

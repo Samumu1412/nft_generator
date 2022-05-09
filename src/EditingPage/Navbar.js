@@ -40,10 +40,11 @@ export const NavComponent = (props) => {
               animation: "glow 2s ease-in-out infinite alternate",
               marginLeft: "0.5vw",
             }}
+            onClick={(event) => (window.location.href = "/")}
           >
-            <a className="landingNavMenu" href="https://linktr.ee/nft_paradise">
+            <div className="landingNavMenu">
               Neo Base
-            </a>
+            </div>
           </Typography>
 
           <Typography
@@ -55,9 +56,8 @@ export const NavComponent = (props) => {
               marginLeft: "76vw",
             }}
             className="landingNavMenu"
-            onClick={(event) => (window.location.href = "/")}
           >
-            NFT Automator
+            NFT Generator
           </Typography>
         </Toolbar>
       </AppBar>

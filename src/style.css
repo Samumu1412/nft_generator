@@ -18,7 +18,11 @@
     min-height: 100%;
   }
 
-
+  .area{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
   .landingButtons {
     display: flex;
@@ -31,13 +35,6 @@
     font-weight: "bold";
     animation: glow 2s ease-in-out infinite alternate;
     text-align: center;
-  }
-
-  .landingNavMenu:hover {
-    color: rgb(190, 190, 190);
-    animation: glow 2s ease-in-out infinite alternate;
-    cursor: pointer;
-    /* background-color: #2b2b2b98; */
   }
 
   .transparent-button{
@@ -167,7 +164,7 @@
   .description-container {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     flex-direction: column;
     background-color: black;
     width: 600px;
