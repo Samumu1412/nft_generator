@@ -3,21 +3,21 @@ import { Backdrop } from "@material-ui/core";
 import { Box } from "@material-ui/core";
 import { Modal } from "@material-ui/core";
 import { Fade } from "@material-ui/core";
+import "./style.css"
+import { map } from "lodash";
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 1000,
-  height: 650,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  borderRadius: "10px",
-  p: 4,
-  backgroundColor: "#525050d7",
-};
+const members = [
+  'roger',
+  'gt',
+  'vivian',
+]
+
+const intro = {
+  roger: 'intro1 ...',
+  gt: 'intro2...',
+  vivian: 'intro3...',
+}
+
 
 export const AboutModalComponent = (props) => {
   return (
@@ -34,10 +34,25 @@ export const AboutModalComponent = (props) => {
         }}
       >
         <Fade in={props.isOpen}>
-          <Box sx={style}>
-            <p style={{ color: "#fff", fontFamily: "monospace" }}>
-              This is a About project
-            </p>
+          <Box className="modal-component">
+            {map(members, (member, index) => (
+              <div className="row" key={member} style={{ padding: 10 }}>
+                <img
+                  src={require(`../Assets/avatar${index+1}.png`)}
+                  alt="toolpass"
+                  style={{
+                    zIndex: 3,
+                    width: '200px',
+                    height: '200px',
+                    borderRadius: '200px',
+                    marginRight: '20px' 
+                  }}
+                />
+                <p className="description-text">
+                  {intro[member]}
+                </p>
+              </div>
+            ))}
           </Box>
         </Fade>
       </Modal>

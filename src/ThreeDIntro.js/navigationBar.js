@@ -1,22 +1,17 @@
 import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-
-// Using Inline Styling
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  menuButton: {
-    marginRight: theme.spacing(2),
-  },
-}));
+import { isNil, get, truncate } from "lodash"
 
 // Exporting Default Navbar to the App.js File
-export const NavHomePage = (props) => {
-  const classes = useStyles();
+export const NavHomePage = ({
+  setAboutOpen,
+  setRoadmapOpen,
+  setFAQOpen,
+  onConnect,
+  userInfo
+}) => {
 
   return (
     <AppBar
@@ -31,7 +26,7 @@ export const NavHomePage = (props) => {
         style={{
           zIndex: 10,
           backgroundColor: "#2b2b2b30",
-
+          justifyContent: 'flex-end',
           borderRadius: "10px",
           height: "25px",
         }}
@@ -43,10 +38,10 @@ export const NavHomePage = (props) => {
             className="landingNavMenu"
             style={{ fontFamily: "monospace" }}
             onClick={() => {
-              props.setInstructionsOpen(true);
+              setAboutOpen(true);
             }}
           >
-            HOME
+            ABOUT
           </Typography>
         </div>
 
@@ -57,10 +52,10 @@ export const NavHomePage = (props) => {
             className="landingNavMenu"
             style={{ fontFamily: "monospace" }}
             onClick={() => {
-              props.setContactOpen(true);
+              setRoadmapOpen(true);
             }}
           >
-            CONTACT
+            ROADMAP
           </Typography>
         </div>
 
@@ -71,10 +66,28 @@ export const NavHomePage = (props) => {
             className="landingNavMenu"
             style={{ fontFamily: "monospace" }}
             onClick={() => {
-              props.setAboutOpen(true);
+              setFAQOpen(true);
             }}
           >
-            ABOUT US
+            FAQ
+          </Typography>
+        </div>
+        <div className="eachOne">
+          <Typography
+            variant="h6"
+            color="inherit"
+            className="landingNavMenu"
+            style={{ fontFamily: "monospace" }}
+            onClick={() => {
+              if(isNil(get(userInfo, 'address'))) {
+                onConnect()
+              }
+            }}
+          >
+            {isNil(get(userInfo, 'address'))
+              ? 'CONNECT'
+              : truncate(userInfo.address, { length: 8 })
+            }
           </Typography>
         </div>
       </Toolbar>
