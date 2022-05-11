@@ -152,7 +152,7 @@ export const Page = (props) => {
         <div
           style={{
             display: "flex",
-            justifyContent: "center",
+            justifyContent: "space-between",
             backgroundColor: "rgba(110, 110, 110, 0.658)",
             color: "#fff",
             fontFamily: "monospace",
@@ -163,6 +163,7 @@ export const Page = (props) => {
           <p>
             Canvas Height:{" "}
             <input
+              style={{ width: 40 }}
               onChange={(event) => {
                 setCanvasHeight({
                   value: JSON.parse(event.target.value),
@@ -171,6 +172,7 @@ export const Page = (props) => {
             />
             &nbsp; px &nbsp;Canvas Width:{" "}
             <input
+              style={{ width: 40 }}
               onChange={(event) => {
                 setCanvasWidth({
                   value: JSON.parse(event.target.value),
@@ -179,8 +181,12 @@ export const Page = (props) => {
             />
             &nbsp; px
           </p>
+          <p>
+            Selection: {selection.name} &nbsp; X: {coord.x} Y: {coord.y}
+          </p>
         </div>
-        <div id="content">
+
+        <div className="items-container">
           <Items
             onClick={setCurrentElement}
             files={props.folderStructure}
@@ -190,21 +196,6 @@ export const Page = (props) => {
             setCoord={setCoord}
             parent={parentRef}
           />
-        </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "right",
-            backgroundColor: "rgba(110, 110, 110, 0.658)",
-            color: "#fff",
-            fontFamily: "monospace",
-            marginTop: "-11vh",
-            paddingRight: "5px",
-          }}
-        >
-          <p>
-            Selection: {selection.name} &nbsp; X: {coord.x} Y: {coord.y}
-          </p>
         </div>
       </div>
       <div
@@ -218,7 +209,7 @@ export const Page = (props) => {
       >
         <div
           style={{
-            backgroundColor: "#efefef",
+            backgroundColor: "rgb(23, 23, 44)",
             height: "100vh",
             margin: "5px 0px 5px 5px ",
             padding: "5px",
@@ -239,20 +230,12 @@ export const Page = (props) => {
             }}
           >
             <div style={{ justifyContent: "center", display: "flex" }}>
-              <Button
-                variant="contained"
-                style={{
-                  borderRadius: 35,
-                  backgroundColor: "#f50057",
-                  color: "#fff",
-                  padding: "10px 20px",
-                  fontSize: "13px",
-                }}
-                size="medium"
+              <button
+                className="transparent-button"
                 onClick={handleRarityOpen}
               >
-                💎 Add Rarity 💎
-              </Button>
+                Add Rarity
+              </button>
             </div>
             <div
               style={{
@@ -261,16 +244,14 @@ export const Page = (props) => {
                 marginTop: "15px",
               }}
             >
-              <Button
-                variant="contained"
-                style={{ backgroundColor: "#21b6ae", color: "#fff" }}
-                size="large"
+              <button
+                className="transparent-button"
                 onClick={
                   totalCopies && totalCopies.value > 10000 ? null : handleOpen
                 }
               >
                 Generate
-              </Button>
+              </button>
             </div>
             <div>
               <RarityModalComponent

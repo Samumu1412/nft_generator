@@ -4,6 +4,7 @@ import { Box } from "@material-ui/core";
 import { Modal } from "@material-ui/core";
 import { Fade, Button } from "@material-ui/core";
 import TreesTempRarity from "./FolderStructureRarity";
+import "../style.css"
 
 const style = {
   position: "absolute",
@@ -52,14 +53,13 @@ export const RarityModalComponent = (props) => {
                 display: "flex",
               }}
             >
-              <Button
-                variant="contained"
-                color="secondary"
-                size="large"
+              <button
+                className="transparent-button"
+                style={{ margin: 10 }}
                 onClick={props.handleClose}
               >
                 Submit
-              </Button>
+              </button>
             </div>
           </Box>
         </Fade>

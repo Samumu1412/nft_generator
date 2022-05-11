@@ -4,6 +4,8 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 
+import "../style.css"
+
 // Using Inline Styling
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -30,7 +32,7 @@ export const NavComponent = (props) => {
   return (
     <div className={classes.root} style={{ color: "#212529" }}>
       <AppBar position="sticky" style={{ background: "rgb(16, 16, 32)" }}>
-        <Toolbar variant="dense">
+        <Toolbar variant="dense" style={{ justifyContent: 'space-between' }}>
 
           <Typography
             variant="h6"
@@ -53,7 +55,6 @@ export const NavComponent = (props) => {
             style={{
               fontFamily: "monospace",
               animation: "glow 2s ease-in-out infinite alternate",
-              marginLeft: "76vw",
             }}
             className="landingNavMenu"
           >

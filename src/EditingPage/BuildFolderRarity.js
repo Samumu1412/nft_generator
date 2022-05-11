@@ -63,7 +63,7 @@ export const FoldersRarity = (props) => {
                     style={{
                       width: "25%",
                       paddingLeft: "2%",
-                      color: "#fff",
+                      color: "white",
                     }}
                   >
                     <TextField
@@ -71,7 +71,7 @@ export const FoldersRarity = (props) => {
                       size="small"
                       variant="outlined"
                       inputProps={{ style: { textAlign: "center" } }}
-                      placeholder="out of 100"
+                      placeholder="/100"
                       onBlur={(event) => {
                         handleRaritySet(index1, index2, event.target.value);
                       }}

@@ -64,8 +64,8 @@ export const EditingPage = () => {
         objects.push({
           name: obj.name,
           path: obj.path,
-          height: 100,
-          width: 100,
+          height: 500,
+          width: 500,
           depth: 0,
           x: 0,
           y: 0,

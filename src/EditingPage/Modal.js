@@ -35,6 +35,9 @@ export const ModalComponent = (props) => {
   const [next, setNext] = React.useState(false);
   const [code, setCode] = React.useState("");
 
+  console.log('obj', objects)
+  console.log('file', fileData)
+
   const handleClick = async () => {
     const data = {
       objects: objects,
@@ -66,8 +69,6 @@ export const ModalComponent = (props) => {
       totalCopies: total,
       name: name,
     };
-    console.log('total', total)
-    console.log('name', name)
     setNext(true);
   };
 

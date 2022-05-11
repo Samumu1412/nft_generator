@@ -117,7 +117,7 @@ app.post("/deleteLocalFiles", (req, res) => {
   return res.status(200).json("Success");
 });
 
-const wr = (w) => {
+const weightTo = (w) => {
   const cw = [];
   for (let i = 0; i < w.length; i += 1) {
     cw[i] = w[i] + (cw[i - 1] || 0);
@@ -135,6 +135,7 @@ const wr = (w) => {
 
 app.post("/submitDetails", (request, response) => {
   const data = request.body;
+  console.log('data', data)
   const uuid = data.uuid;
   const tree = data.folderTree;
   const width = data.canvasWidth;
@@ -191,12 +192,14 @@ app.post("/submitDetails", (request, response) => {
 
     // eslint-disable-next-line no-loop-func
     tree.children.forEach(async (item, index) => {
+      console.log('item', item)
       const weights = [];
       item.children.forEach((item) =>
         weights.push(item.rarity ? item.rarity : 50)
       );
 
-      const idx = wr(weights);
+      const idx = weightTo(weights);
+      console.log('idx', idx)
       const obj = item.children[idx];
 
       objRarity += item.children[idx].rarity ? item.children[idx].rarity : 50;
@@ -315,16 +318,5 @@ app.listen(port, () => {
   //   if (err) console.error(err);
   // });
   console.log(`Server is running on port: ${port}`);
-  console.log(`Example app listening at http://sickalien.store:${port}`);
+  console.log(`Example app listening at ${port}`);
 });
-
-//s3Actions.uploadFile("uuid/src/EditingPage/layers/ball/red eye ball_sr.png");
-//uploadFile("src/EditingPage/layers/ball/white eye ball.png");
-//s3Actions.emptyS3Directory(process.env.BUCKET_NAME, "src/");
-// tree &&
-//   tree.children &&
-//   tree.children.forEach((items) => {
-//     items &&
-//       items.children &&
-//       items.children.forEach((item) => s3Actions.uploadFile(item.path));
-//   });
