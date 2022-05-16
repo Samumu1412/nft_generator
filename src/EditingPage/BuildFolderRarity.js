@@ -71,7 +71,7 @@ export const FoldersRarity = (props) => {
                       size="small"
                       variant="outlined"
                       inputProps={{ style: { textAlign: "center" } }}
-                      placeholder="/100"
+                      placeholder="how many should there be?"
                       onBlur={(event) => {
                         handleRaritySet(index1, index2, event.target.value);
                       }}

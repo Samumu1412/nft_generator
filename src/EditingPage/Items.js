@@ -4,8 +4,8 @@ import { ObjectSelection, ObjectContext } from "./EditingPage";
 import "./Items.css";
 
 export const Items = (props) => {
-  const { selection, dispatch2 } = React.useContext(ObjectSelection);
-  const { objects, dispatch1 } = React.useContext(ObjectContext);
+  const { selection, disPatchSelection } = React.useContext(ObjectSelection);
+  const { objects, disPatchObjects } = React.useContext(ObjectContext);
 
   let elements = props.hashedFolder;
   if (objects && objects.length) {

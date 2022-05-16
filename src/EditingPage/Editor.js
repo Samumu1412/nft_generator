@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useContext, useRef, useEffect } from "react";
 import { SliderComponent } from "./Slider";
 import { ObjectContext, ObjectSelection } from "./EditingPage";
 
 export const Editor = (props) => {
-  const { objects, dispatch1 } = React.useContext(ObjectContext);
-  const { selection, dispatch2 } = React.useContext(ObjectSelection);
+  const { objects } = useContext(ObjectContext);
+  const { selection } = useContext(ObjectSelection);
 
   const commonStyle = {
     margin: "10px",
@@ -16,11 +16,11 @@ export const Editor = (props) => {
     fontFamily: "monospace",
   };
 
-  const currentValues = React.useRef(
+  const currentValues = useRef(
     props.currentValues.find((obj) => obj.name === selection.name)
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     currentValues.current =
       objects && objects.find((obj) => obj.name === selection.name);
   }, [objects, selection.name]);

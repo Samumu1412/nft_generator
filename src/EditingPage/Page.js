@@ -1,41 +1,39 @@
-import React from "react";
+import React, { useCallback, useContext, useState, useRef } from "react";
+import { forEach, keys, map } from 'lodash'
 
-import { Editor } from "./Editor";
 import { Items } from "./Items";
 import { NumberOfCopies, ObjectContext, ObjectSelection } from "./EditingPage";
 import { EditorInput } from "./EditorInput";
 import TreesTemp from "./FolderStructure";
-import { Button } from "@material-ui/core";
 import "./Page.css";
 import { ModalComponent } from "./Modal";
 import { LoadingModalComponent } from "./loadingModal";
-import axios from "axios";
 import { RarityModalComponent } from "./RarityModal";
 
 export const Page = (props) => {
-  const { dispatch1 } = React.useContext(ObjectContext);
-  const { selection, dispatch2 } = React.useContext(ObjectSelection);
-  const { dispatch3 } = React.useContext(NumberOfCopies);
-  const [totalCopies, setTotalCopies] = React.useState({ value: 0 });
-  const [open, setOpen] = React.useState(false);
-  const [rarityOpen, setRarityOpen] = React.useState(false);
-  const [loadingModal, setLoadingModal] = React.useState(false);
-  const [coord, setCoor] = React.useState({ x: 0, y: 0 });
-  const [canvasHeight, setCanvasHeight] = React.useState({
+  const { disPatchObjects } = useContext(ObjectContext);
+  const { selection, disPatchSelection } = useContext(ObjectSelection);
+  const { disPatchNumberOfCopies } = useContext(NumberOfCopies);
+  const [totalCopies, setTotalCopies] = useState(0);
+  const [open, setOpen] = useState(false);
+  const [rarityOpen, setRarityOpen] = useState(false);
+  const [loadingModal, setLoadingModal] = useState(false);
+  const [coord, setCoor] = useState({ x: 0, y: 0 });
+  const [canvasHeight, setCanvasHeight] = useState({
     value: 400,
   });
-  const [canvasWidth, setCanvasWidth] = React.useState({
+  const [canvasWidth, setCanvasWidth] = useState({
     value: 400,
   });
 
   const setCurrentElement = (val) => {
-    dispatch2({
+    disPatchSelection({
       type: "update",
       name: val,
     });
   };
 
-  var parentRef = React.useRef(null);
+  var parentRef = useRef(null);
 
   const handleMouseOver = (e) => {
     const parent = parentRef.current.getBoundingClientRect();
@@ -44,8 +42,6 @@ export const Page = (props) => {
     const width = rect.width;
     const positionX = rect.left - parent.left;
     const positionY = rect.top - parent.top;
-
-    //console.log(`width: ${width}, position: ${positionX} , ${positionY}`);
     const values = { x: positionX, y: positionY };
 
     return values;
@@ -54,17 +50,17 @@ export const Page = (props) => {
   const setCoord = (event, file) => {
     const curr_Coor = handleMouseOver(event);
 
-    dispatch2({
+    disPatchSelection({
       type: "update",
       name: `${file.name}`,
     });
-    dispatch1({
+    disPatchObjects({
       type: "update",
       nameToFind: selection.name,
       valueToChange: "x",
       currentSlide: curr_Coor.x,
     });
-    dispatch1({
+    disPatchObjects({
       type: "update",
       nameToFind: selection.name,
       valueToChange: "y",
@@ -74,34 +70,26 @@ export const Page = (props) => {
     setCoor({ x: curr_Coor.x, y: curr_Coor.y });
   };
 
-  const editValues = (input1, input2, input4) => {
-    if (input1.value) {
-      dispatch1({
-        type: "update",
-        nameToFind: selection.name,
-        valueToChange: input1.name,
-        currentSlide: input1.value,
-      });
-    }
-
-    if (input2.value) {
-      dispatch1({
-        type: "update",
-        nameToFind: selection.name,
-        valueToChange: input2.name,
-        currentSlide: input2.value,
-      });
-    }
-
-    if (input4.value) {
-      dispatch3({
-        type: "update",
-        value: input4.value,
-      });
-
-      setTotalCopies({ value: input4.value });
-    }
-  };
+  const setValues = useCallback((input) => {
+    console.log(input)
+    const inputKeys = keys(input)
+    forEach(inputKeys, (key) => {
+      if(key === 'copyAmount') {
+        setTotalCopies(input[key]);
+        disPatchNumberOfCopies({
+          type: "update",
+          value: input[key]
+        })
+      } else {
+        disPatchObjects({
+          type: "update",
+          nameToFind: selection.name,
+          valueToChange: key,
+          currentSlide: input[key],
+        });
+      }
+    })
+  }, [selection]);
 
   const handleOpen = () => {
     setOpen(true);
@@ -122,7 +110,7 @@ export const Page = (props) => {
   const openLoadingModal = () => {
     setLoadingModal(true);
   };
-
+  console.log('ddd', props)
   return (
     <div>
       <div
@@ -218,10 +206,7 @@ export const Page = (props) => {
           }}
         >
           <div>
-            <Editor currentValues={props.hashedElements} />
-          </div>
-          <div>
-            <EditorInput setValues={editValues} />
+            <EditorInput setValues={setValues} layers={map(props.hashedElements, 'name')}/>
           </div>
           <div
             style={{

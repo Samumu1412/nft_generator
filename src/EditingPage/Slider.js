@@ -1,57 +1,23 @@
-import React from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Slider from "@material-ui/core/Slider";
-import { useState } from "react";
 import { ObjectContext, ObjectSelection } from "./EditingPage";
 import "./Slider.css";
 
 export const SliderComponent = (props) => {
   const [currentSlide, setCurrentSlide] = useState(props.value);
-  const { objects, dispatch1 } = React.useContext(ObjectContext);
-  const { selection, dispatch2 } = React.useContext(ObjectSelection);
+  const { disPatchObjects } = useContext(ObjectContext);
+  const { selection, disPatchSelection } = useContext(ObjectSelection);
 
   const valueToChange = props.name;
 
-  const marks = [
-    {
-      value: 0,
-    },
-    {
-      value: 20,
-    },
-    {
-      value: 37,
-    },
-    {
-      value: 50,
-    },
-    {
-      value: 100,
-    },
-  ];
 
-  const formatValue = (value) => {
-    if (value < 20) {
-      return "Common";
-    }
-    if (value >= 20 && value < 37) {
-      return "Rare";
-    }
-    if (value >= 37 && value < 50) {
-      return "Very Rare";
-    }
-    if (value >= 50 && value < 100) {
-      return "Alien";
-    }
-    return "GodLike";
-  };
-
-  React.useEffect(() => {
+  useEffect(() => {
     setCurrentSlide(props.value);
   }, [props.value]);
 
   const changeValue = (event, newValue) => {
     setCurrentSlide(newValue);
-    dispatch1({
+    disPatchObjects({
       type: "update",
       nameToFind: selection.name,
       valueToChange: valueToChange,

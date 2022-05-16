@@ -11,14 +11,14 @@ import { Typography } from "@material-ui/core";
 import "./buildFolder.css";
 
 export const Folders = (props) => {
-  const { objects, dispatch1 } = React.useContext(ObjectContext);
-  const { selection, dispatch2 } = React.useContext(ObjectSelection);
+  const { objects, disPatchObjects } = React.useContext(ObjectContext);
+  const { selection, disPatchSelection } = React.useContext(ObjectSelection);
   const children = props.children;
   let folderStructure = [];
 
   const handleClick = (folder, subfolder) => {
     //console.log(objects, "folder: ", folder, subfolder, "index: ", index);
-    dispatch1({
+    disPatchObjects({
       type: "update",
       nameToFind: folder,
       valueToChange: "path",

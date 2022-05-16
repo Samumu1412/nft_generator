@@ -9,6 +9,12 @@ const FileSync = require("lowdb/adapters/FileSync");
 const s3Actions = require("./s3Actions");
 var multer = require("multer");
 const archiver = require("archiver");
+const ora = require('ora');
+const inquirer = require('inquirer');
+const { readFile, writeFile, readdir } = require("fs").promises;
+const mergeImages = require('merge-images');
+const { Image, Canvas } = require('canvas');
+const ImageDataURI = require('image-data-uri');
 
 var path = require("path");
 
@@ -117,155 +123,87 @@ app.post("/deleteLocalFiles", (req, res) => {
   return res.status(200).json("Success");
 });
 
-const weightTo = (w) => {
-  const cw = [];
-  for (let i = 0; i < w.length; i += 1) {
-    cw[i] = w[i] + (cw[i - 1] || 0);
-  }
 
-  const mcw = cw[cw.length - 1];
-  const rn = mcw * Math.random();
-
-  for (let i = 0; i < w.length; i += 1) {
-    if (cw[i] >= rn) {
-      return i;
-    }
-  }
+//SETTINGS
+let basePath;
+let outputPath;
+let traits;
+let traitsToSort = [];
+let order = [];
+let weights = {};
+let names = {};
+let weightedTraits = [];
+let seen = [];
+let metaData = {};
+let config = {
+  metaData: {},
+  useCustomNames: null,
+  deleteDuplicates: null,
+  generateMetadata: null,
 };
 
-app.post("/submitDetails", (request, response) => {
+const getDirectories = source =>
+  fs
+    .readdirSync(source, { withFileTypes: true })
+    .filter(dirent => dirent.isDirectory())
+    .map(dirent => dirent.name);
+
+const sleep = seconds => new Promise(resolve => setTimeout(resolve, seconds * 1000))
+
+
+app.post("/submitDetails", async (request, response) => {
   const data = request.body;
   console.log('data', data)
-  const uuid = data.uuid;
-  const tree = data.folderTree;
-  const width = data.canvasWidth;
-  const height = data.canvasHeight;
-  const canvas = createCanvas(width, height);
-  const metadata = [];
-  const name = data.name;
-  const description = data.description;
-  const URL = data.URL;
-  const context = canvas.getContext("2d", {
-    patternQuality: "bilinear",
-    quality: "bilinear",
-  });
-  var startDate = new Date();
 
-  const layerData = [];
+  basePath = process.cwd() + `/${data.folderTree.path}/`
+  outputPath = process.cwd() + `/generated/${data.uuid}/`
+  config.deleteDuplicates = true
+  config.generateMetadata = true
+  config.metaData.name = data.name;
+  config.metaData.description = data.description;
+  config.metaData.splitFiles = false;
 
-  data &&
-    data.objects.map((obj) => {
-      layerData.push(obj);
-    });
+  let lastChar = data.URL.slice(-1);
+  if (lastChar === '/') config.imageUrl = data.URL;
+  else config.imageUrl = data.URL + '/';
 
-  // sorting based on depth
-  layerData &&
-    layerData.sort((a, b) => {
-      return a.depth - b.depth;
-    });
+  const loadingDirectories = ora('Loading traits');
+  loadingDirectories.color = 'yellow';
+  loadingDirectories.start();
 
-  var values = data.total.value;
+  traits = getDirectories(basePath);
+  traitsToSort = [...traits];
+  await sleep(2);
+  loadingDirectories.succeed();
+  loadingDirectories.clear();
+  console.log('config1: ', config)
+  config.order = data.order
+  config.weights = data.weights
 
-  if (values > 10000) {
-    return;
+  console.log('config2: ', config)
+  const generatingImages = ora('Generating images');
+  generatingImages.color = 'yellow';
+  generatingImages.start();
+  await generateImages();
+  await sleep(2);
+  generatingImages.succeed('All images generated!');
+  generatingImages.clear();
+  if (config.generateMetadata) {
+    const writingMetadata = ora('Exporting metadata');
+    writingMetadata.color = 'yellow';
+    writingMetadata.start();
+    await writeMetadata();
+    await sleep(0.5);
+    writingMetadata.succeed('Exported metadata successfully');
+    writingMetadata.clear();
   }
 
-  const folderLayers = tree.children;
 
-  const finalLayers = [];
-
-  // sorting the tree layers based on depth
-  layerData.forEach((item) => {
-    finalLayers.push(folderLayers.filter((obj) => obj.name === item.name)[0]);
-  });
-
-  tree.children = finalLayers;
-
-  if (fs.existsSync(`generated/${uuid}`) === false) {
-    fs.mkdirSync(`generated/${uuid}`, { recursive: true });
-  }
-
-  while (values) {
-    var hash = 0;
-    let objRarity = 0;
-    let totalRarity = 0;
-
-    // eslint-disable-next-line no-loop-func
-    tree.children.forEach(async (item, index) => {
-      console.log('item', item)
-      const weights = [];
-      item.children.forEach((item) =>
-        weights.push(item.rarity ? item.rarity : 50)
-      );
-
-      const idx = weightTo(weights);
-      console.log('idx', idx)
-      const obj = item.children[idx];
-
-      objRarity += item.children[idx].rarity ? item.children[idx].rarity : 50;
-      totalRarity += 100;
-
-      const image = await loadImage(`./${obj.path}`);
-
-      context.drawImage(
-        image,
-        JSON.parse(layerData[index].x),
-        JSON.parse(layerData[index].y),
-        JSON.parse(layerData[index].width),
-        JSON.parse(layerData[index].height)
-      );
-      const buffer = canvas.toBuffer("image/png", 0);
-      fs.writeFileSync(__dirname + `/generated/${uuid}/${hash}.png`, buffer);
-
-      if (tree.children.length === index + 1) {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        if (hash === data.total.value) {
-          const jsonContent = JSON.stringify(metadata);
-          fs.writeFile(
-            `generated/${uuid}/metadata.json`,
-            jsonContent,
-            "utf8",
-            function (err) {
-              if (err) {
-                console.log(
-                  "An error occured while writing JSON Object to File."
-                );
-                return console.log(err);
-              }
-
-              console.log("JSON file has been saved.");
-            }
-          );
-          return response.json("Success").status(200);
-        }
-
-        const rarityPercentage = (objRarity / totalRarity) * 100;
-
-        // Metadata Generation
-        const dataImage = {
-          name: `${name} #${hash}`,
-          description: description,
-          external_link: URL,
-          traits: {
-            rarity: rarityPercentage,
-          },
-        };
-
-        metadata.push(dataImage);
-        hash += 1;
-      }
-    });
-
-    hash += 1;
-    values -= 1;
-  }
-  var endDate = new Date();
-  var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
-  console.log("The total Time Taken was : ", seconds);
-  const totalUsers = db.get("TotalUsers").value() + 1;
-  const totalItems = db.get("TotalItems").value();
-  db.set("TotalUsers", totalUsers).write();
-  db.set("TotalItems", data.total.value + totalItems).write();
+  //console.log("The total Time Taken was : ", seconds);
+  //const totalUsers = db.get("TotalUsers").value() + 1;
+  //const totalItems = db.get("TotalItems").value();
+  //db.set("TotalUsers", totalUsers).write();
+  //db.set("TotalItems", data.total.value + totalItems).write();
 });
 
 app.get("/compress", (req, res) => {
@@ -312,6 +250,7 @@ app.get("/resolveFiles", function (req, res, next) {
   return res.status(200).json("Success");
 });
 
+
 app.listen(port, () => {
   // Uncommented for connecting to mongoDB
   // dbo.connectToServer(function (err) {
@@ -320,3 +259,240 @@ app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
   console.log(`Example app listening at ${port}`);
 });
+
+
+//SELECT THE ORDER IN WHICH THE TRAITS SHOULD BE COMPOSITED
+async function traitsOrder(isFirst) {
+  if (config.order && config.order.length === traits.length) {
+    order = config.order;
+    return;
+  }
+  const traitsPrompt = {
+    type: 'list',
+    name: 'selected',
+    choices: [],
+  };
+  traitsPrompt.message = 'Which trait should be on top of that?';
+  if (isFirst === true) traitsPrompt.message = 'Which trait is the background?';
+  traitsToSort.forEach(trait => {
+    const globalIndex = traits.indexOf(trait);
+    traitsPrompt.choices.push({
+      name: trait.toUpperCase(),
+      value: globalIndex,
+    });
+  });
+  const { selected } = await inquirer.prompt(traitsPrompt);
+  order.push(selected);
+  config.order = order;
+  let localIndex = traitsToSort.indexOf(traits[selected]);
+  traitsToSort.splice(localIndex, 1);
+  if (order.length === traits.length) return;
+  await traitsOrder(false);
+}
+
+//SELECT IF WE WANT TO SET CUSTOM NAMES FOR EVERY TRAITS OR USE FILENAMES
+async function customNamesPrompt() {
+    if (config.useCustomNames !== null) return;
+    let { useCustomNames } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'useCustomNames',
+        message: 'How should be constructed the names of the traits?',
+        choices: [
+          { name: 'Use filenames as traits names', value: 0 },
+          { name: 'Choose custom names for each trait', value: 1 },
+        ],
+      },
+    ]);
+    config.useCustomNames = useCustomNames;
+}
+
+//SET NAMES FOR EVERY TRAIT
+async function setNames(trait) {
+  if (config.useCustomNames) {
+    names = config.names || names;
+    const files = await getFilesForTrait(trait);
+    const namePrompt = [];
+    files.forEach((file, i) => {
+      if (config.names && config.names[file] !== undefined) return;
+      namePrompt.push({
+        type: 'input',
+        name: trait + '_name_' + i,
+        message: 'What should be the name of the trait shown in ' + file + '?',
+      });
+    });
+    const selectedNames = await inquirer.prompt(namePrompt);
+    files.forEach((file, i) => {
+      if (config.names && config.names[file] !== undefined) return;
+      names[file] = selectedNames[trait + '_name_' + i];
+    });
+    config.names = {...config.names, ...names};
+  } else {
+    const files = fs.readdirSync(basePath + '/' + trait);
+    files.forEach((file, i) => {
+      names[file] = file.split('.')[0];
+    });
+  }
+}
+
+//SET WEIGHTS FOR EVERY TRAIT
+async function setWeights(trait) {
+  if (config.weights && Object.keys(config.weights).length === Object.keys(names).length ) {
+    weights = config.weights;
+    return;
+  }
+  const files = await getFilesForTrait(trait);
+  const weightPrompt = [];
+  files.forEach((file, i) => {
+    weightPrompt.push({
+      type: 'input',
+      name: names[file] + '_weight',
+      message: 'How many ' + names[file] + ' ' + trait + ' should there be?',
+      default: parseInt(Math.round(10000 / files.length)),
+    });
+  });
+  const selectedWeights = await inquirer.prompt(weightPrompt);
+  files.forEach((file, i) => {
+    weights[file] = selectedWeights[names[file] + '_weight'];
+  });
+  config.weights = weights;
+}
+
+//ASYNC FOREACH
+async function asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
+}
+
+//GENERATE WEIGHTED TRAITS
+async function generateWeightedTraits() {
+  for (const trait of traits) {
+    const traitWeights = [];
+    const files = await getFilesForTrait(trait);
+    files.forEach(file => {
+      for (let i = 0; i < weights[file]; i++) {
+        traitWeights.push(file);
+      }
+    });
+    weightedTraits.push(traitWeights);
+  }
+}
+
+//GENARATE IMAGES
+async function generateImages() {
+  let noMoreMatches = 0;
+  let images = [];
+  let id = 0;
+  await generateWeightedTraits();
+  if (config.deleteDuplicates) {
+    while (!Object.values(weightedTraits).filter(arr => arr.length == 0).length && noMoreMatches < 20000) {
+      let picked = [];
+      order.forEach(id => {
+        let pickedImgId = pickRandom(weightedTraits[id]);
+        picked.push(pickedImgId);
+        let pickedImg = weightedTraits[id][pickedImgId];
+        images.push(basePath + traits[id] + '/' + pickedImg);
+      });
+
+      if (existCombination(images)) {
+        noMoreMatches++;
+        images = [];
+      } else {
+        generateMetadataObject(id, images);
+        noMoreMatches = 0;
+        order.forEach((id, i) => {
+          remove(weightedTraits[id], picked[i]);
+        });
+        seen.push(images);
+        const b64 = await mergeImages(images, { Canvas: Canvas, Image: Image });
+        await ImageDataURI.outputFile(b64, outputPath + `${id}.png`);
+        images = [];
+        id++;
+      }
+    }
+  } else {
+    while (!Object.values(weightedTraits).filter(arr => arr.length == 0).length) {
+      order.forEach(id => {
+        images.push(
+          basePath + traits[id] + '/' + pickRandomAndRemove(weightedTraits[id])
+        );
+      });
+      generateMetadataObject(id, images);
+      const b64 = await mergeImages(images, { Canvas: Canvas, Image: Image });
+      await ImageDataURI.outputFile(b64, outputPath + `${id}.png`);
+      images = [];
+      id++;
+    }
+  }
+}
+
+//GENERATES RANDOM NUMBER BETWEEN A MAX AND A MIN VALUE
+function randomNumber(min, max) {
+  return Math.round(Math.random() * (max - min) + min);
+}
+
+//PICKS A RANDOM INDEX INSIDE AN ARRAY RETURNS IT AND THEN REMOVES IT
+function pickRandomAndRemove(array) {
+  const toPick = randomNumber(0, array.length - 1);
+  const pick = array[toPick];
+  array.splice(toPick, 1);
+  return pick;
+}
+
+//PICKS A RANDOM INDEX INSIDE AND ARRAY RETURNS IT
+function pickRandom(array) {
+  return randomNumber(0, array.length - 1);
+}
+
+function remove(array, toPick) {
+  array.splice(toPick, 1);
+}
+
+function existCombination(contains) {
+  let exists = false;
+  seen.forEach(array => {
+    let isEqual =
+      array.length === contains.length &&
+      array.every((value, index) => value === contains[index]);
+    if (isEqual) exists = true;
+  });
+  return exists;
+}
+
+function generateMetadataObject(id, images) {
+  metaData[id] = {
+    name: config.metaData.name + ' #' + id,
+    description: config.metaData.description,
+    image: config.imageUrl + id,
+    attributes: [],
+  };
+  images.forEach((image, i) => {
+    let pathArray = image.split('/');
+    let fileToMap = pathArray[pathArray.length - 1];
+    metaData[id].attributes.push({
+      trait_type: traits[order[i]],
+      value: names[fileToMap],
+    });
+  });
+}
+
+async function writeMetadata() {
+  if(config.metaData.splitFiles)
+  {
+    let metadata_output_dir = outputPath + "metadata/"
+    if (!fs.existsSync(metadata_output_dir)) {
+      fs.mkdirSync(metadata_output_dir, { recursive: true });
+    }
+    for (var key in metaData){
+      await writeFile(metadata_output_dir + key, JSON.stringify(metaData[key]));
+    }
+  }else
+  {
+    await writeFile(outputPath + 'metadata.json', JSON.stringify(metaData));
+  }
+}
+
+async function getFilesForTrait(trait) {
+  return (await readdir(basePath + '/' + trait)).filter(file => file !== '.DS_Store');
+}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, createContext, useEffect, useReducer } from "react";
 import {
   objectReducer,
   selectionReducer,
@@ -10,15 +10,15 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import { NavComponent } from "./Navbar";
 import axios from "axios";
 
-export const ObjectContext = React.createContext();
-export const ObjectSelection = React.createContext();
-export const NumberOfCopies = React.createContext();
-export const TreeContext = React.createContext();
+export const ObjectContext = createContext();
+export const ObjectSelection = createContext();
+export const NumberOfCopies = createContext();
+export const TreeContext = createContext();
 
 export const EditingPage = () => {
   const baseURL = "http://localhost:8443/getFolderTree";
 
-  const [fileData, setFileData] = React.useState(null);
+  const [fileData, setFileData] = useState(null);
 
   let selection = null;
   let objects = [];
@@ -32,7 +32,7 @@ export const EditingPage = () => {
     setFileData(data.data);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     getTree();
   }, []);
 
@@ -76,10 +76,10 @@ export const EditingPage = () => {
 
   objects = getObjects(hashCodeElement);
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatchMain({ type: "add", payload: fileData });
-    dispatch1({ type: "add", payload: objects });
-    dispatch2({
+    disPatchObjects({ type: "add", payload: objects });
+    disPatchSelection({
       type: "update",
       name: hashCodeElement.length ? hashCodeElement[0].name : null,
     });
@@ -88,28 +88,28 @@ export const EditingPage = () => {
   selection = { name: hashCodeElement[0] };
   total = { value: 100 };
 
-  const [TreeState, dispatchMain] = React.useReducer(
+  const [TreeState, dispatchMain] = useReducer(
     TreeReducer,
     fileData?.children
   );
-  const [ObjectState, dispatch1] = React.useReducer(objectReducer, objects);
-  const [SelectionState, dispatch2] = React.useReducer(
+  const [ObjectState, disPatchObjects] = useReducer(objectReducer, objects);
+  const [SelectionState, disPatchSelection] = useReducer(
     selectionReducer,
     selection
   );
-  const [NumberOfCopiesState, dispatch3] = React.useReducer(
+  const [NumberOfCopiesState, disPatchNumberOfCopies] = useReducer(
     totalElementsReducer,
     total
   );
 
   return (
     <TreeContext.Provider value={{ fileData: TreeState, dispatchMain }}>
-      <ObjectContext.Provider value={{ objects: ObjectState, dispatch1 }}>
+      <ObjectContext.Provider value={{ objects: ObjectState, disPatchObjects }}>
         <ObjectSelection.Provider
-          value={{ selection: SelectionState, dispatch2 }}
+          value={{ selection: SelectionState, disPatchSelection }}
         >
           <NumberOfCopies.Provider
-            value={{ total: NumberOfCopiesState, dispatch3 }}
+            value={{ total: NumberOfCopiesState, disPatchNumberOfCopies }}
           >
             <CssBaseline>
               <div style={{ maxHeight: "20px", zIndex: 21 }}>

@@ -50,21 +50,38 @@ async function main() {
   }
 
   await loadConfig("config.json");
-  await getBasePath();
-  await getOutputPath();
-  await checkForDuplicates();
-  await generateMetadataPrompt();
+  
+  //await getBasePath();
+  basePath = process.cwd() + `/${tree.path}`
+  //await getOutputPath();
+  outputPath = process.cwd() + `/generated/${uuid}`
+  //await checkForDuplicates();
+  config.deleteDuplicates = true
+
+  //await generateMetadataPrompt();
+  config.generateMetadata = true
+
   if (config.generateMetadata) {
-    await metadataSettings();
+    //await metadataSettings();
   }
+  config.metaData.name = data.name;
+  config.metaData.description = data.description;
+  config.metaData.splitFiles = false;
+
+  let lastChar = data.URL.slice(-1);
+  if (lastChar === '/') config.imageUrl = data.URL;
+  else config.imageUrl = data.URL + '/';
+
   const loadingDirectories = ora('Loading traits');
   loadingDirectories.color = 'yellow';
   loadingDirectories.start();
+
   traits = getDirectories(basePath);
   traitsToSort = [...traits];
   await sleep(2);
   loadingDirectories.succeed();
   loadingDirectories.clear();
+  
   await traitsOrder(true);
   await customNamesPrompt();
   await asyncForEach(traits, async trait => {
@@ -106,6 +123,7 @@ async function getBasePath() {
     basePath = config.basePath;
     return;
   }
+
   const { base_path } = await inquirer.prompt([
     {
       type: 'list',

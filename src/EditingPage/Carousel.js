@@ -5,9 +5,9 @@ import { NumberOfCopies, ObjectContext } from "./EditingPage";
 import "./Carousel.css";
 
 export const DemoCarousel = () => {
-  const { objects, dispatch1 } = React.useContext(ObjectContext);
+  const { objects, disPatchObjects } = React.useContext(ObjectContext);
 
-  const { total, dispatch3 } = React.useContext(NumberOfCopies);
+  const { total, disPatchNumberOfCopies } = React.useContext(NumberOfCopies);
   const responsive = {
     superLargeDesktop: {
       breakpoint: { max: 4000, min: 3000 },
