@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { Button, Fade, TextField } from "@material-ui/core";
-import { NumberOfCopies, ObjectContext, TreeContext } from "./EditingPage";
+import { ObjectContext } from "./EditingPage";
 import { ToastContainer, toast } from "react-toastify";
 
 import { Backdrop } from "@material-ui/core";
@@ -26,9 +26,8 @@ const style = {
 };
 
 export const ModalComponent = (props) => {
-  const { objects } = React.useContext(ObjectContext);
-  const { total } = React.useContext(NumberOfCopies);
-  const { fileData } = React.useContext(TreeContext);
+  const { objects, numberOfCopies, tree } = React.useContext(ObjectContext);
+
   const [name, setName] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [URL, setURL] = React.useState("");
@@ -38,11 +37,11 @@ export const ModalComponent = (props) => {
   const handleClick = async () => {
     const data = {
       objects: objects,
-      total: total,
+      total: numberOfCopies,
       uuid: JSON.parse(sessionStorage.uuid),
       canvasHeight: props.canvasHeight,
       canvasWidth: props.canvasWidth,
-      folderTree: fileData,
+      folderTree: tree,
       name: name,
       description: description,
       URL: URL,
@@ -63,7 +62,7 @@ export const ModalComponent = (props) => {
   const handleFormSubmit = async () => {
     const data = {
       hash: code,
-      totalCopies: total,
+      totalCopies: numberOfCopies,
       name: name,
     };
     setNext(true);

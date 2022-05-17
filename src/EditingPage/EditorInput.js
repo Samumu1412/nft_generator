@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { TextField, Button } from "@material-ui/core";
-import { map, keyBy } from 'lodash';
+import { map, toPlainObject, toArray } from 'lodash';
 
 export const EditorInput = (props) => {
   const commonStyle = {
@@ -14,17 +14,14 @@ export const EditorInput = (props) => {
   const [height, setHeight] = useState(500);
   const [width, setWidth] = useState(500);
   const [copyAmount, setCopyAmount] = useState(100);
-  const [layersOrder, setLayerOrder] = useState(
-    keyBy(props.layers, (index) => (
-      index
-  )));
+  const [layersOrder, setLayerOrder] = useState(toPlainObject(props.layers))
 
   const handleFinalClick = useCallback(() => {
     return copyAmount > 10000 ? null : props.setValues({
       height,
       width,
       copyAmount,
-      layersOrder
+      layersOrder: toArray(layersOrder)
     });
   },[height, width, copyAmount]);
 
@@ -62,10 +59,7 @@ export const EditorInput = (props) => {
             inputProps={{ style: { textAlign: "center" } }}
             placeholder="(in px)"
             onChange={(event) => {
-              setHeight({
-                name: "height",
-                value: JSON.parse(event.target.value),
-              });
+              setHeight(JSON.parse(event.target.value));
             }}
             onBlur={handleFinalClick}
           />
@@ -82,7 +76,7 @@ export const EditorInput = (props) => {
           inputProps={{ style: { textAlign: "center" } }}
           placeholder="(in px)"
           onChange={(event) => {
-            setWidth({ name: "width", value: JSON.parse(event.target.value) });
+            setWidth(JSON.parse(event.target.value));
           }}
           onBlur={handleFinalClick}
         />

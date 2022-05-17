@@ -1,10 +1,9 @@
 import React from "react";
 import { Rnd } from "react-rnd";
-import { ObjectSelection, ObjectContext } from "./EditingPage";
+import { ObjectContext } from "./EditingPage";
 import "./Items.css";
 
 export const Items = (props) => {
-  const { selection, disPatchSelection } = React.useContext(ObjectSelection);
   const { objects, disPatchObjects } = React.useContext(ObjectContext);
 
   let elements = props.hashedFolder;

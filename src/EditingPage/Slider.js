@@ -1,12 +1,11 @@
 import React, { useState, useContext, useEffect } from "react";
 import Slider from "@material-ui/core/Slider";
-import { ObjectContext, ObjectSelection } from "./EditingPage";
+import { ObjectContext } from "./EditingPage";
 import "./Slider.css";
 
 export const SliderComponent = (props) => {
   const [currentSlide, setCurrentSlide] = useState(props.value);
-  const { disPatchObjects } = useContext(ObjectContext);
-  const { selection, disPatchSelection } = useContext(ObjectSelection);
+  const { disPatchObjects, selection } = useContext(ObjectContext);
 
   const valueToChange = props.name;
 

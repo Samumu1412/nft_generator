@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
-import { NumberOfCopies, ObjectContext, ObjectSelection } from "./EditingPage";
+import { ObjectContext } from "./EditingPage";
 import { useTheme } from "@material-ui/core/styles";
 import { TreeView } from "@material-ui/lab";
 import TreeItem from "@material-ui/lab/TreeItem";
@@ -12,7 +12,6 @@ import "./buildFolder.css";
 
 export const Folders = (props) => {
   const { objects, disPatchObjects } = React.useContext(ObjectContext);
-  const { selection, disPatchSelection } = React.useContext(ObjectSelection);
   const children = props.children;
   let folderStructure = [];
 
@@ -35,12 +34,12 @@ export const Folders = (props) => {
           <div>
             <ListItem key={index1} button component="a" href="#">
               <Typography
-                style={{ backgroundColor: "#102841" }}
                 className="element"
                 // eslint-disable-next-line react/jsx-no-duplicate-props
                 style={{
                   fontWeight: "bold",
                   fontFamily: "monospace",
+                  backgroundColor: "#102841"
                 }}
               >
                 {folder.name.slice(0, 1).toUpperCase() + folder.name.slice(1)}

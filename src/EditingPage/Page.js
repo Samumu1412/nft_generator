@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useState, useRef } from "react";
 import { forEach, keys, map } from 'lodash'
 
 import { Items } from "./Items";
-import { NumberOfCopies, ObjectContext, ObjectSelection } from "./EditingPage";
+import { ObjectContext } from "./EditingPage";
 import { EditorInput } from "./EditorInput";
 import TreesTemp from "./FolderStructure";
 import "./Page.css";
@@ -11,9 +11,8 @@ import { LoadingModalComponent } from "./loadingModal";
 import { RarityModalComponent } from "./RarityModal";
 
 export const Page = (props) => {
-  const { disPatchObjects } = useContext(ObjectContext);
-  const { selection, disPatchSelection } = useContext(ObjectSelection);
-  const { disPatchNumberOfCopies } = useContext(NumberOfCopies);
+  const { disPatchObjects, selection, disPatchSelection, disPatchNumberOfCopies } = useContext(ObjectContext);
+
   const [totalCopies, setTotalCopies] = useState(0);
   const [open, setOpen] = useState(false);
   const [rarityOpen, setRarityOpen] = useState(false);
@@ -38,8 +37,6 @@ export const Page = (props) => {
   const handleMouseOver = (e) => {
     const parent = parentRef.current.getBoundingClientRect();
     const rect = e.target.getBoundingClientRect();
-
-    const width = rect.width;
     const positionX = rect.left - parent.left;
     const positionY = rect.top - parent.top;
     const values = { x: positionX, y: positionY };
@@ -110,7 +107,7 @@ export const Page = (props) => {
   const openLoadingModal = () => {
     setLoadingModal(true);
   };
-  console.log('ddd', props)
+
   return (
     <div>
       <div

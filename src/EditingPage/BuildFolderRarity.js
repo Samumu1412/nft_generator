@@ -1,16 +1,16 @@
 import React from "react";
 import ListItem from "@material-ui/core/ListItem";
-import { TreeContext } from "./EditingPage";
+import { ObjectContext } from "./EditingPage";
 import TreeItem from "@material-ui/lab/TreeItem";
 import { Typography, TextField } from "@material-ui/core";
 import "./buildFolder.css";
 
 export const FoldersRarity = (props) => {
-  const { dispatchMain } = React.useContext(TreeContext);
+  const { disPatchTree } = React.useContext(ObjectContext);
   const children = props.children;
 
   const handleRaritySet = (folderIndex, subfolderIndex, val) => {
-    dispatchMain({
+    disPatchTree({
       type: "update",
       value: val,
       folderIndex: folderIndex,

@@ -1,10 +1,9 @@
 import React, { useContext, useRef, useEffect } from "react";
 import { SliderComponent } from "./Slider";
-import { ObjectContext, ObjectSelection } from "./EditingPage";
+import { ObjectContext } from "./EditingPage";
 
 export const Editor = (props) => {
-  const { objects } = useContext(ObjectContext);
-  const { selection } = useContext(ObjectSelection);
+  const { objects, selection } = useContext(ObjectContext);
 
   const commonStyle = {
     margin: "10px",

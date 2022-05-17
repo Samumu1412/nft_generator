@@ -1,13 +1,12 @@
 import React from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
-import { NumberOfCopies, ObjectContext } from "./EditingPage";
+import { ObjectContext } from "./EditingPage";
 import "./Carousel.css";
 
 export const DemoCarousel = () => {
-  const { objects, disPatchObjects } = React.useContext(ObjectContext);
+  const { objects, numberOfCopies } = React.useContext(ObjectContext);
 
-  const { total, disPatchNumberOfCopies } = React.useContext(NumberOfCopies);
   const responsive = {
     superLargeDesktop: {
       breakpoint: { max: 4000, min: 3000 },
@@ -62,7 +61,7 @@ export const DemoCarousel = () => {
           color: "rgba(255, 255, 255, 0.904)",
         }}
       >
-        <h1>{`${total.value}`}</h1>
+        <h1>{`${numberOfCopies.value}`}</h1>
       </div>
 
       <Carousel responsive={responsive} focusOnSelect={true}>

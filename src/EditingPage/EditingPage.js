@@ -11,6 +11,7 @@ import { NavComponent } from "./Navbar";
 import axios from "axios";
 
 export const ObjectContext = createContext();
+
 export const ObjectSelection = createContext();
 export const NumberOfCopies = createContext();
 export const TreeContext = createContext();
@@ -77,7 +78,7 @@ export const EditingPage = () => {
   objects = getObjects(hashCodeElement);
 
   useEffect(() => {
-    dispatchMain({ type: "add", payload: fileData });
+    disPatchTree({ type: "add", payload: fileData });
     disPatchObjects({ type: "add", payload: objects });
     disPatchSelection({
       type: "update",
@@ -88,7 +89,7 @@ export const EditingPage = () => {
   selection = { name: hashCodeElement[0] };
   total = { value: 100 };
 
-  const [TreeState, dispatchMain] = useReducer(
+  const [TreeState, disPatchTree] = useReducer(
     TreeReducer,
     fileData?.children
   );
@@ -103,29 +104,29 @@ export const EditingPage = () => {
   );
 
   return (
-    <TreeContext.Provider value={{ fileData: TreeState, dispatchMain }}>
-      <ObjectContext.Provider value={{ objects: ObjectState, disPatchObjects }}>
-        <ObjectSelection.Provider
-          value={{ selection: SelectionState, disPatchSelection }}
-        >
-          <NumberOfCopies.Provider
-            value={{ total: NumberOfCopiesState, disPatchNumberOfCopies }}
-          >
-            <CssBaseline>
-              <div style={{ maxHeight: "20px", zIndex: 21 }}>
-                <NavComponent folderStructure={fileData} />
-              </div>
-              <div style={{ margin: "2px" }}>
-                <Page
-                  folderStructure={fileData}
-                  selection={selection}
-                  hashedElements={objects}
-                />
-              </div>
-            </CssBaseline>
-          </NumberOfCopies.Provider>
-        </ObjectSelection.Provider>
+      <ObjectContext.Provider value={{
+          objects: ObjectState,
+          disPatchObjects,
+          tree: TreeState,
+          disPatchTree,
+          selection: SelectionState,
+          disPatchSelection,
+          numberOfCopies: NumberOfCopiesState,
+          disPatchNumberOfCopies,
+
+        }}>
+          <CssBaseline>
+            <div style={{ maxHeight: "20px", zIndex: 21 }}>
+              <NavComponent folderStructure={fileData} />
+            </div>
+            <div style={{ margin: "2px" }}>
+              <Page
+                folderStructure={fileData}
+                selection={selection}
+                hashedElements={objects}
+              />
+            </div>
+          </CssBaseline>
       </ObjectContext.Provider>
-    </TreeContext.Provider>
   );
 };
