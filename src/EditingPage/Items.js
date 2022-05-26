@@ -4,7 +4,7 @@ import { ObjectContext } from "./EditingPage";
 import "./Items.css";
 
 export const Items = (props) => {
-  const { objects, disPatchObjects } = React.useContext(ObjectContext);
+  const { objects } = React.useContext(ObjectContext);
 
   let elements = props.hashedFolder;
   if (objects && objects.length) {

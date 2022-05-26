@@ -11,7 +11,13 @@ import { LoadingModalComponent } from "./loadingModal";
 import { RarityModalComponent } from "./RarityModal";
 
 export const Page = (props) => {
-  const { disPatchObjects, selection, disPatchSelection, disPatchNumberOfCopies } = useContext(ObjectContext);
+  const { 
+    disPatchObjects,
+    selection,
+    disPatchSelection,
+    disPatchNumberOfCopies,
+    disPatchLayerOrder
+  } = useContext(ObjectContext);
 
   const [totalCopies, setTotalCopies] = useState(0);
   const [open, setOpen] = useState(false);
@@ -68,12 +74,17 @@ export const Page = (props) => {
   };
 
   const setValues = useCallback((input) => {
-    console.log(input)
+    console.log('input', input)
     const inputKeys = keys(input)
     forEach(inputKeys, (key) => {
       if(key === 'copyAmount') {
         setTotalCopies(input[key]);
         disPatchNumberOfCopies({
+          type: "update",
+          value: input[key]
+        })
+      } else if (key === 'layerOrder') {
+        disPatchLayerOrder({
           type: "update",
           value: input[key]
         })

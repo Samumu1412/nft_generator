@@ -1,5 +1,6 @@
 import React, { useState, createContext, useEffect, useReducer } from "react";
 import {
+  arrayReducer,
   objectReducer,
   selectionReducer,
   totalElementsReducer,
@@ -12,10 +13,6 @@ import axios from "axios";
 
 export const ObjectContext = createContext();
 
-export const ObjectSelection = createContext();
-export const NumberOfCopies = createContext();
-export const TreeContext = createContext();
-
 export const EditingPage = () => {
   const baseURL = "http://localhost:8443/getFolderTree";
 
@@ -24,12 +21,12 @@ export const EditingPage = () => {
   let selection = null;
   let objects = [];
   let total = { value: 100 };
+  let order = []
 
   const getTree = async () => {
     const data = await axios.get(baseURL, {
       params: { uuid: JSON.parse(sessionStorage.uuid) },
     });
-    //const data = await response.json();
     setFileData(data.data);
   };
 
@@ -84,6 +81,10 @@ export const EditingPage = () => {
       type: "update",
       name: hashCodeElement.length ? hashCodeElement[0].name : null,
     });
+    disPatchLayerOrder({
+      type: "update",
+      value: order
+    })
   }, [fileData]);
 
   selection = { name: hashCodeElement[0] };
@@ -103,6 +104,24 @@ export const EditingPage = () => {
     total
   );
 
+  const getLayerOrder = (files) => {
+    const order = [];
+
+    subfoldersLength &&
+      files &&
+      files.map((_, index) => {
+        order.push(JSON.stringify(index));
+      });
+    return order;
+  };
+
+  order = getLayerOrder(hashCodeElement)
+
+  const [layerOrder, disPatchLayerOrder] = useReducer(
+    arrayReducer,
+    order
+  )
+  console.log(layerOrder)
   return (
       <ObjectContext.Provider value={{
           objects: ObjectState,
@@ -113,7 +132,8 @@ export const EditingPage = () => {
           disPatchSelection,
           numberOfCopies: NumberOfCopiesState,
           disPatchNumberOfCopies,
-
+          layerOrder,
+          disPatchLayerOrder,
         }}>
           <CssBaseline>
             <div style={{ maxHeight: "20px", zIndex: 21 }}>

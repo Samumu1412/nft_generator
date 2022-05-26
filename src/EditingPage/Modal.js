@@ -26,8 +26,7 @@ const style = {
 };
 
 export const ModalComponent = (props) => {
-  const { objects, numberOfCopies, tree } = React.useContext(ObjectContext);
-
+  const { objects, numberOfCopies, tree, layerOrder } = React.useContext(ObjectContext);
   const [name, setName] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [URL, setURL] = React.useState("");
@@ -45,6 +44,7 @@ export const ModalComponent = (props) => {
       name: name,
       description: description,
       URL: URL,
+      layerOrder
     };
     props.openLoadingModal();
     axios

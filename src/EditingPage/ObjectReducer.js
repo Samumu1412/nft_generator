@@ -60,3 +60,16 @@ export const totalElementsReducer = (state, action) => {
       return state;
   }
 };
+
+export const arrayReducer = (state, action) => {
+  console.log(action)
+  switch (action.type) {
+    case "update":
+      const newState = state;
+      const { value } = action;
+      newState.value = value;
+      return newState;
+    default:
+      return state;
+  }
+}

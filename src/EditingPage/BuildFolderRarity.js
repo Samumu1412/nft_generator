@@ -6,7 +6,7 @@ import { Typography, TextField } from "@material-ui/core";
 import "./buildFolder.css";
 
 export const FoldersRarity = (props) => {
-  const { disPatchTree } = React.useContext(ObjectContext);
+  const { disPatchTree, numberOfCopies } = React.useContext(ObjectContext);
   const children = props.children;
 
   const handleRaritySet = (folderIndex, subfolderIndex, val) => {
@@ -28,7 +28,7 @@ export const FoldersRarity = (props) => {
                 className="rarityFolder"
                 style={{ fontFamily: "monospace", fontWeight: "bold" }}
               >
-                {folder.name.slice(0, 1).toUpperCase() + folder.name.slice(1)}
+                {`${folder.name.slice(0, 1).toUpperCase() + folder.name.slice(1)} ${numberOfCopies.value} Copies`}
               </Typography>
             </ListItem>
 

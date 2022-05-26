@@ -1,27 +1,29 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { TextField, Button } from "@material-ui/core";
-import { map, toPlainObject, toArray } from 'lodash';
+import { map, toPlainObject, assign, isNil } from 'lodash';
+
+const commonStyle = {
+  margin: "10px",
+  backgroundColor: "#c1c9d1",
+  padding: "5px",
+  borderRadius: "10px",
+  boxShadow: "1px 3px 1px #afafaf",
+};
 
 export const EditorInput = (props) => {
-  const commonStyle = {
-    margin: "10px",
-    backgroundColor: "#c1c9d1",
-    padding: "5px",
-    borderRadius: "10px",
-    boxShadow: "1px 3px 1px #afafaf",
-  };
+  const { layers, setValues } = props
 
   const [height, setHeight] = useState(500);
   const [width, setWidth] = useState(500);
   const [copyAmount, setCopyAmount] = useState(100);
-  const [layersOrder, setLayerOrder] = useState(toPlainObject(props.layers))
+  const [orderInput, setOrderInput] = useState(layers)
 
   const handleFinalClick = useCallback(() => {
-    return copyAmount > 10000 ? null : props.setValues({
+    return copyAmount > 10000 ? null : setValues({
       height,
       width,
       copyAmount,
-      layersOrder: toArray(layersOrder)
+      layerOrder: orderInput
     });
   },[height, width, copyAmount]);
 
@@ -115,10 +117,11 @@ export const EditorInput = (props) => {
               margin="dense"
               variant="outlined"
               onChange={(event) => {
-                setLayerOrder(layerOrder => ({
-                  ...layerOrder,
-                  [layerName]: event.target.value
-                }))
+                setOrderInput(layerOrder => {
+                  return assign(layerOrder, {
+                    [layerName]: event.target.value
+                  })
+                })
               }}
               onBlur={handleFinalClick}
             />
