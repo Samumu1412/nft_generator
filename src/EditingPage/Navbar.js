@@ -1,63 +1,49 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
+import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import { AppBar, Toolbar, Typography } from '@material-ui/core';
+
+import '../style.css';
 
 // Using Inline Styling
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
     primary: {
-      main: "000",
+      main: '000',
     },
   },
 }));
 
 // Exporting Default Navbar to the App.js File
-export const NavComponent = (props) => {
+export const NavComponent = () => {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   return (
-    <div className={classes.root} style={{ color: "#212529" }}>
-      <AppBar position="sticky" style={{ background: "rgb(16, 16, 32)" }}>
-        <Toolbar variant="dense">
-
+    <div className={classes.root} style={{ color: '#212529' }}>
+      <AppBar position="sticky" style={{ background: 'rgb(16, 16, 32)' }}>
+        <Toolbar variant="dense" style={{ justifyContent: 'space-between' }}>
           <Typography
             variant="h6"
-            color="#fff"
             style={{
-              fontFamily: "monospace",
-              animation: "glow 2s ease-in-out infinite alternate",
-              marginLeft: "0.5vw",
+              fontFamily: 'monospace',
+              animation: 'glow 2s ease-in-out infinite alternate',
+              marginLeft: '0.5vw',
             }}
+            onClick={() => (window.location.href = '/')}
           >
-            <a className="landingNavMenu" href="https://linktr.ee/nft_paradise">
-              Neo Base
-            </a>
+            <div className="landingNavMenu">Neo Base</div>
           </Typography>
 
           <Typography
             variant="h6"
             color="inherit"
             style={{
-              fontFamily: "monospace",
-              animation: "glow 2s ease-in-out infinite alternate",
-              marginLeft: "76vw",
+              fontFamily: 'monospace',
+              animation: 'glow 2s ease-in-out infinite alternate',
             }}
             className="landingNavMenu"
-            onClick={(event) => (window.location.href = "/")}
           >
-            NFT Automator
+            NFT Generator
           </Typography>
         </Toolbar>
       </AppBar>

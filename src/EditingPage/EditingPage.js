@@ -1,131 +1,155 @@
-import React from "react";
+import React, {
+  useState,
+  createContext,
+  useEffect,
+  useReducer,
+  useMemo,
+} from 'react';
 import {
+  arrayReducer,
   objectReducer,
   selectionReducer,
   totalElementsReducer,
   TreeReducer,
-} from "./ObjectReducer";
-import { Page } from "./Page";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import { NavComponent } from "./Navbar";
-import axios from "axios";
+} from './ObjectReducer';
+import { Page } from './Page';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import { NavComponent } from './Navbar';
+import axios from 'axios';
 
-export const ObjectContext = React.createContext();
-export const ObjectSelection = React.createContext();
-export const NumberOfCopies = React.createContext();
-export const TreeContext = React.createContext();
+export const ObjectContext = createContext();
 
 export const EditingPage = () => {
-  const baseURL = "http://localhost:8443/getFolderTree";
+  const baseURL = 'http://localhost:8443/getFolderTree';
 
-  const [fileData, setFileData] = React.useState(null);
-
-  let selection = null;
-  let objects = [];
-  let total = { value: 100 };
+  const [fileData, setFileData] = useState(null);
 
   const getTree = async () => {
     const data = await axios.get(baseURL, {
       params: { uuid: JSON.parse(sessionStorage.uuid) },
     });
-    //const data = await response.json();
     setFileData(data.data);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     getTree();
   }, []);
 
-  const subfoldersLength =
-    fileData && fileData.children && fileData.children.length;
+  const subfoldersLength = useMemo(
+    () => fileData && fileData.children && fileData.children.length,
+    [fileData]
+  );
 
-  const hashCodeElement = [];
-  const pathList = [];
+  const [TreeState, disPatchTree] = useReducer(TreeReducer, fileData?.children);
 
-  for (let i = 0; i < subfoldersLength; i++) {
-    fileData &&
-      fileData.children &&
-      pathList.push(fileData.children[i].children[0].path.slice(3));
-  }
+  const hashCodeElement = useMemo(() => {
+    const pathList = [];
+    const ele = [];
+    for (let i = 0; i < subfoldersLength; i++) {
+      fileData &&
+        fileData.children &&
+        pathList.push(fileData.children[i].children[0].path.slice(3));
+    }
 
-  for (let i = 0; i < subfoldersLength; i++) {
-    hashCodeElement.push({
-      name: fileData.children.length ? fileData.children[i].name : null,
-      path: pathList[i],
-    });
-  }
+    for (let i = 0; i < subfoldersLength; i++) {
+      ele.push({
+        name: fileData.children.length ? fileData.children[i].name : null,
+        path: pathList[i],
+      });
+    }
+    return ele;
+  }, [fileData, subfoldersLength]);
 
-  const getObjects = (files) => {
+  const selection = useMemo(
+    () => ({ name: hashCodeElement[0] }),
+    [hashCodeElement]
+  );
+
+  const [SelectionState, disPatchSelection] = useReducer(
+    selectionReducer,
+    selection
+  );
+
+  const total = { value: 100 };
+
+  const [NumberOfCopiesState, disPatchNumberOfCopies] = useReducer(
+    totalElementsReducer,
+    total
+  );
+
+  const objects = useMemo(() => {
     const objects = [];
-
     subfoldersLength &&
-      files &&
-      files.map((obj) => {
+      hashCodeElement &&
+      hashCodeElement.map((obj) => {
         objects.push({
           name: obj.name,
           path: obj.path,
-          height: 100,
-          width: 100,
+          height: 500,
+          width: 500,
           depth: 0,
           x: 0,
           y: 0,
         });
       });
     return objects;
-  };
+  }, [hashCodeElement, subfoldersLength]);
 
-  objects = getObjects(hashCodeElement);
+  const [ObjectState, disPatchObjects] = useReducer(objectReducer, objects);
 
-  React.useEffect(() => {
-    dispatchMain({ type: "add", payload: fileData });
-    dispatch1({ type: "add", payload: objects });
-    dispatch2({
-      type: "update",
+  const order = useMemo(() => {
+    const order = [];
+
+    subfoldersLength &&
+      hashCodeElement &&
+      hashCodeElement.map((_, index) => {
+        order.push(JSON.stringify(index));
+      });
+    return order;
+  }, [subfoldersLength, hashCodeElement]);
+
+  const [layerOrder, disPatchLayerOrder] = useReducer(arrayReducer, order);
+
+  useEffect(() => {
+    disPatchTree({ type: 'add', payload: fileData });
+    disPatchObjects({ type: 'add', payload: objects });
+    disPatchSelection({
+      type: 'update',
       name: hashCodeElement.length ? hashCodeElement[0].name : null,
     });
-  }, [fileData]);
-
-  selection = { name: hashCodeElement[0] };
-  total = { value: 100 };
-
-  const [TreeState, dispatchMain] = React.useReducer(
-    TreeReducer,
-    fileData?.children
-  );
-  const [ObjectState, dispatch1] = React.useReducer(objectReducer, objects);
-  const [SelectionState, dispatch2] = React.useReducer(
-    selectionReducer,
-    selection
-  );
-  const [NumberOfCopiesState, dispatch3] = React.useReducer(
-    totalElementsReducer,
-    total
-  );
+    disPatchLayerOrder({
+      type: 'update',
+      value: order,
+    });
+  }, [fileData, hashCodeElement, objects, order]);
 
   return (
-    <TreeContext.Provider value={{ fileData: TreeState, dispatchMain }}>
-      <ObjectContext.Provider value={{ objects: ObjectState, dispatch1 }}>
-        <ObjectSelection.Provider
-          value={{ selection: SelectionState, dispatch2 }}
-        >
-          <NumberOfCopies.Provider
-            value={{ total: NumberOfCopiesState, dispatch3 }}
-          >
-            <CssBaseline>
-              <div style={{ maxHeight: "20px", zIndex: 21 }}>
-                <NavComponent folderStructure={fileData} />
-              </div>
-              <div style={{ margin: "2px" }}>
-                <Page
-                  folderStructure={fileData}
-                  selection={selection}
-                  hashedElements={objects}
-                />
-              </div>
-            </CssBaseline>
-          </NumberOfCopies.Provider>
-        </ObjectSelection.Provider>
-      </ObjectContext.Provider>
-    </TreeContext.Provider>
+    <ObjectContext.Provider
+      value={{
+        objects: ObjectState,
+        disPatchObjects,
+        tree: TreeState,
+        disPatchTree,
+        selection: SelectionState,
+        disPatchSelection,
+        numberOfCopies: NumberOfCopiesState,
+        disPatchNumberOfCopies,
+        layerOrder,
+        disPatchLayerOrder,
+      }}
+    >
+      <CssBaseline>
+        <div style={{ maxHeight: '20px', zIndex: 21 }}>
+          <NavComponent folderStructure={fileData} />
+        </div>
+        <div style={{ margin: '2px' }}>
+          <Page
+            folderStructure={fileData}
+            selection={selection}
+            hashedElements={objects}
+          />
+        </div>
+      </CssBaseline>
+    </ObjectContext.Provider>
   );
 };

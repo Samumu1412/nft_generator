@@ -1,128 +1,11 @@
-const express = require("express");
-var cors = require("cors");
-const bodyParser = require("body-parser");
-const { createCanvas, loadImage } = require("canvas");
-const app = express();
-const fs = require("fs");
-const lowDb = require("lowdb");
-const FileSync = require("lowdb/adapters/FileSync");
-const s3Actions = require("./s3Actions");
-var multer = require("multer");
-const archiver = require("archiver");
+//IMPORTS
 const ora = require('ora');
 const inquirer = require('inquirer');
+const fs = require('fs');
 const { readFile, writeFile, readdir } = require("fs").promises;
 const mergeImages = require('merge-images');
 const { Image, Canvas } = require('canvas');
 const ImageDataURI = require('image-data-uri');
-
-var path = require("path");
-
-require("dotenv").config({ path: "./config.env" });
-// Uncomment for Database connection
-// const dbo = require("./DB/connection");
-
-const db = lowDb(new FileSync("./src/traffic.json"));
-
-//Here we are configuring express to use body-parser as middle-ware.
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
-app.use(cors());
-const port = 8443;
-
-const dirTree = require("directory-tree");
-
-app.get("/getFolderTree", (req, res) => {
-  const uuid = req.query.uuid;
-  const tree = dirTree(`src/EditingPage/layers/${uuid}`);
-  res.send(JSON.stringify(tree));
-});
-
-app.get("/getTotalUsers", (req, res) => {
-  const data = db.get("TotalUsers").value();
-  return res.json(data);
-});
-
-app.get("/getTotalItems", (req, res) => {
-  const data = db.get("TotalItems").value();
-  return res.json(data);
-});
-
-const dest = `src/EditingPage/layers/`;
-
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, dest);
-  },
-  filename: function (req, file, cb) {
-    if (fs.existsSync(`${dest}/${file.fieldname}`)) {
-      cb(null, `${file.fieldname}/${file.originalname}`);
-    } else {
-      fs.mkdirSync(`${dest}/${file.fieldname}`, { recursive: true });
-      cb(null, `${file.fieldname}/${file.originalname}`);
-    }
-  },
-});
-
-const fields = [];
-var filePaths = new Set();
-
-var upload = multer({
-  limits: { fileSize: 10485760 },
-  storage: storage,
-}).fields(fields);
-
-app.post("/uploadFiles", (req, res) => {
-  upload(req, res, function (err) {
-    if (err instanceof multer.MulterError) {
-      console.log(err);
-      return res.status(500).json(err);
-    } else if (err) {
-      // fs.rmdir(
-      //   `./src/EditingPage/layers/${uuid}`,
-      //   { recursive: true },
-      //   (err) => {
-      //     if (err) {
-      //       return console.log("error occurred in deleting directory", err);
-      //     }
-
-      //     console.log("Directory deleted successfully");
-      //   }
-      // );
-      console.log(err);
-      return res.status(500).json(err);
-    }
-
-    return res.status(200).send(req.file);
-  });
-});
-
-app.post("/uploadPath", (req, res) => {
-  req.body.forEach((file) => {
-    const filePath = file.path.split("/")[1];
-    const hashKey = file.uuid;
-    filePaths.add(hashKey + "/" + filePath);
-  });
-
-  filePaths.forEach((file) => {
-    fields.push({ name: file });
-  });
-});
-
-app.post("/deleteLocalFiles", (req, res) => {
-  const data = req.body;
-  const uuid = data.uuid;
-  fs.rmdir(`./src/EditingPage/layers/${uuid}`, { recursive: true }, (err) => {
-    if (err) {
-      return console.log("error occurred in deleting directory", err);
-    }
-
-    console.log("Directory deleted successfully");
-  });
-  return res.status(200).json("Success");
-});
-
 
 //SETTINGS
 let basePath;
@@ -141,7 +24,11 @@ let config = {
   deleteDuplicates: null,
   generateMetadata: null,
 };
+let loadedConfig = false;
 
+let argv = require('minimist')(process.argv.slice(2));
+
+//DEFINITIONS
 const getDirectories = source =>
   fs
     .readdirSync(source, { withFileTypes: true })
@@ -150,15 +37,33 @@ const getDirectories = source =>
 
 const sleep = seconds => new Promise(resolve => setTimeout(resolve, seconds * 1000))
 
+//OPENING
 
-app.post("/submitDetails", async (request, response) => {
-  const data = request.body;
-  console.log('data', data)
+main();
 
-  basePath = process.cwd() + `/${data.folderTree.path}/`
-  outputPath = process.cwd() + `/generated/${data.uuid}/`
+async function main() {
+  if(argv['load-config']){
+    let file = argv['load-config'];
+  
+    await loadConfig(file);
+    loadedConfig = true;
+  }
+
+  await loadConfig("config.json");
+  
+  //await getBasePath();
+  basePath = process.cwd() + `/${tree.path}`
+  //await getOutputPath();
+  outputPath = process.cwd() + `/generated/${uuid}`
+  //await checkForDuplicates();
   config.deleteDuplicates = true
+
+  //await generateMetadataPrompt();
   config.generateMetadata = true
+
+  if (config.generateMetadata) {
+    //await metadataSettings();
+  }
   config.metaData.name = data.name;
   config.metaData.description = data.description;
   config.metaData.splitFiles = false;
@@ -176,11 +81,15 @@ app.post("/submitDetails", async (request, response) => {
   await sleep(2);
   loadingDirectories.succeed();
   loadingDirectories.clear();
-  console.log('config1: ', config)
-  config.order = data.order
-  config.weights = data.weights
-
-  console.log('config2: ', config)
+  
+  await traitsOrder(true);
+  await customNamesPrompt();
+  await asyncForEach(traits, async trait => {
+    await setNames(trait);
+  });
+  await asyncForEach(traits, async trait => {
+    await setWeights(trait);
+  });
   const generatingImages = ora('Generating images');
   generatingImages.color = 'yellow';
   generatingImages.start();
@@ -197,69 +106,143 @@ app.post("/submitDetails", async (request, response) => {
     writingMetadata.succeed('Exported metadata successfully');
     writingMetadata.clear();
   }
+  if (argv['save-config']) {
+    const writingConfig = ora('Saving configuration');
+    writingConfig.color = 'yellow';
+    writingConfig.start();
+    await writeConfig();
+    await sleep(0.5);
+    writingConfig.succeed('Saved configuration successfully');
+    writingConfig.clear();
+  }
+}
 
+//GET THE BASEPATH FOR THE IMAGES
+async function getBasePath() {
+  if (config.basePath !== undefined) { 
+    basePath = config.basePath;
+    return;
+  }
 
-  //console.log("The total Time Taken was : ", seconds);
-  //const totalUsers = db.get("TotalUsers").value() + 1;
-  //const totalItems = db.get("TotalItems").value();
-  //db.set("TotalUsers", totalUsers).write();
-  //db.set("TotalItems", data.total.value + totalItems).write();
-});
+  const { base_path } = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'base_path',
+      message: 'Where are your images located?',
+      choices: [
+        { name: 'In the current directory', value: 0 },
+        { name: 'Somewhere else on my computer', value: 1 },
+      ],
+    },
+  ]);
+  if (base_path === 0) {
+    basePath = process.cwd() + '/images/';
+  } else {
+    const { file_location } = await inquirer.prompt([
+      {
+        type: 'input',
+        name: 'file_location',
+        message: 'Enter the path to your image files (Absolute filepath)',
+      },
+    ]);
+    let lastChar = file_location.slice(-1);
+    if (lastChar === '/') basePath = file_location;
+    else basePath = file_location + '/';
+  }
+  config.basePath = basePath;
+}
 
-app.get("/compress", (req, res) => {
-  const uuid = req.query.uuid;
-  const output = fs.createWriteStream(`generated/${uuid}.zip`);
-  const archive = archiver("zip");
+//GET THE OUTPUTPATH FOR THE IMAGES
+async function getOutputPath() {
+  if (config.outputPath !== undefined) {
+    outputPath = config.outputPath
+    return;
+  }
+  const { output_path } = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'output_path',
+      message: 'Where should the generated images be exported?',
+      choices: [
+        { name: 'In the current directory', value: 0 },
+        { name: 'Somewhere else on my computer', value: 1 },
+      ],
+    },
+  ]);
+  if (output_path === 0) {
+    outputPath = process.cwd() + '/output/';
+  } else {
+    const { file_location } = await inquirer.prompt([
+      {
+        type: 'input',
+        name: 'file_location',
+        message:
+          'Enter the path to your output_old directory (Absolute filepath)',
+      },
+    ]);
+    let lastChar = file_location.slice(-1);
+    if (lastChar === '/') outputPath = file_location;
+    else outputPath = file_location + '/';
+  }
+  config.outputPath = outputPath;
+}
 
-  archive.on("error", function (err) {
-    res.status(500).send({ error: err.message });
-  });
+async function checkForDuplicates() {
+  if (config.deleteDuplicates !== null) return;
+  let { checkDuplicates } = await inquirer.prompt([
+    {
+      type: 'confirm',
+      name: 'checkDuplicates',
+      message:
+        'Should duplicated images be deleted? (Might result in less images then expected)',
+    },
+  ]);
+  config.deleteDuplicates = checkDuplicates;
+}
 
-  //on stream closed we can end the request
-  archive.on("end", function () {
-    console.log("Archive wrote %d bytes", archive.pointer());
-  });
+async function generateMetadataPrompt() {
+  if (config.generateMetadata !== null) return;
+  let { createMetadata } = await inquirer.prompt([
+    {
+      type: 'confirm',
+      name: 'createMetadata',
+      message: 'Should metadata be generated?',
+    },
+  ]);
+  config.generateMetadata = createMetadata;
+}
 
-  //set the archive name
-  res.attachment(`${uuid}.zip`);
-
-  //this is the streaming magic
-  archive.pipe(output);
-
-  archive.directory(`generated/${uuid}`, `${uuid}`);
-
-  archive.finalize();
-
-  return res.status(200).json("Success");
-});
-
-app.get("/upload", (req, res, next) => {
-  const uuid = req.query.uuid;
-
-  s3Actions.uploadFile(`generated/${uuid}.zip`, res);
-});
-
-app.get("/resolveFiles", function (req, res, next) {
-  const uuid = req.query.uuid;
-
-  // fs.unlink(`./generated/${uuid}.zip`, function (err) {
-  //   if (err) throw err;
-  //   console.log("File deleted!");
-  // });
-
-  return res.status(200).json("Success");
-});
-
-
-app.listen(port, () => {
-  // Uncommented for connecting to mongoDB
-  // dbo.connectToServer(function (err) {
-  //   if (err) console.error(err);
-  // });
-  console.log(`Server is running on port: ${port}`);
-  console.log(`Example app listening at ${port}`);
-});
-
+async function metadataSettings() {
+  if (Object.keys(config.metaData).length !== 0) return;
+  let responses = await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'metadataName',
+      message: 'What should be the name? (Generated format is NAME#ID)',
+    },
+    {
+      type: 'input',
+      name: 'metadataDescription',
+      message: 'What should be the description?',
+    },
+    {
+      type: 'input',
+      name: 'metadataImageUrl',
+      message: 'What should be the image url? (Generated format is URL/ID)',
+    },
+    {
+      type: 'confirm',
+      name: 'splitFiles',
+      message: 'Should JSON metadata be split in multiple files?',
+    },
+  ]);
+  config.metaData.name = responses.metadataName;
+  config.metaData.description = responses.metadataDescription;
+  config.metaData.splitFiles = responses.splitFiles;
+  let lastChar = responses.metadataImageUrl.slice(-1);
+  if (lastChar === '/') config.imageUrl = responses.metadataImageUrl;
+  else config.imageUrl = responses.metadataImageUrl + '/';
+}
 
 //SELECT THE ORDER IN WHICH THE TRAITS SHOULD BE COMPOSITED
 async function traitsOrder(isFirst) {
@@ -462,7 +445,7 @@ function existCombination(contains) {
 
 function generateMetadataObject(id, images) {
   metaData[id] = {
-    name: config.metaData.name + ' #' + id,
+    name: config.metaData.name + '#' + id,
     description: config.metaData.description,
     image: config.imageUrl + id,
     attributes: [],
@@ -491,6 +474,21 @@ async function writeMetadata() {
   {
     await writeFile(outputPath + 'metadata.json', JSON.stringify(metaData));
   }
+}
+
+async function loadConfig(file) {
+  if(loadedConfig == false){
+    try {
+      const data = await readFile(file)
+      config = JSON.parse(data.toString());
+    } catch (error) {
+      console.log("Could not load configuration file.");
+    }
+  }
+}
+
+async function writeConfig() {
+  await writeFile('config.json', JSON.stringify(config, null, 2));
 }
 
 async function getFilesForTrait(trait) {

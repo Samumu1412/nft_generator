@@ -1,68 +1,66 @@
-import * as React from "react";
-import { Backdrop } from "@material-ui/core";
-import { Box } from "@material-ui/core";
-import { Modal } from "@material-ui/core";
-import { Fade, CircularProgress } from "@material-ui/core";
+import * as React from 'react';
+import { Backdrop, Box, Modal, Fade } from '@material-ui/core';
+import PropTypes from 'prop-types';
 
 const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
   width: 1000,
   height: 650,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
   boxShadow: 24,
-  borderRadius: "10px",
+  borderRadius: '10px',
   p: 4,
-  backgroundColor: "#525050d7",
+  backgroundColor: '#525050d7',
 };
 
-export const FinalModalComponent = (props) => {
+export const FinalModalComponent = ({ isOpen, handleClose }) => {
   return (
     <div>
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
-        open={props.isOpen}
-        onClose={props.handleClose}
+        open={isOpen}
+        onClose={handleClose}
         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
           timeout: 500,
         }}
       >
-        <Fade in={props.isOpen}>
+        <Fade in={isOpen}>
           <Box sx={style}>
             <div
               className="typewriter"
               style={{
-                maxHeight: "30px",
-                maxWidth: "70%",
-                color: "#fff",
+                maxHeight: '30px',
+                maxWidth: '70%',
+                color: '#fff',
               }}
             >
               <h3> 🎉🎉 Woohoooo !! Check Generated Folder...</h3>
             </div>
             <div
               style={{
-                display: "flex",
-                justifyContent: "flex-start",
-                color: "#fff",
-                fontFamily: "monospace",
-                marginTop: "20px",
+                display: 'flex',
+                justifyContent: 'flex-start',
+                color: '#fff',
+                fontFamily: 'monospace',
+                marginTop: '20px',
               }}
             >
               Hey Guys,
             </div>
             <div
               style={{
-                display: "flex",
-                justifyContent: "center",
-                color: "#fff",
-                fontFamily: "monospace",
-                marginTop: "30px",
+                display: 'flex',
+                justifyContent: 'center',
+                color: '#fff',
+                fontFamily: 'monospace',
+                marginTop: '30px',
               }}
             >
               Thanks a lot for using this tool , its been my pleasure serving
@@ -73,11 +71,11 @@ export const FinalModalComponent = (props) => {
             </div>
             <div
               style={{
-                display: "flex",
-                justifyContent: "flex-start",
-                color: "#fff",
-                fontFamily: "monospace",
-                marginTop: "30px",
+                display: 'flex',
+                justifyContent: 'flex-start',
+                color: '#fff',
+                fontFamily: 'monospace',
+                marginTop: '30px',
               }}
             >
               Regards, Bitrix
@@ -85,22 +83,22 @@ export const FinalModalComponent = (props) => {
 
             <div
               style={{
-                display: "flex",
-                justifyContent: "center",
-                fontFamily: "monospace",
-                marginTop: "30px",
-                backgroundColor: "rgb(119 119 119 / 84%)",
-                padding: "10px",
-                borderRadius: "10px",
+                display: 'flex',
+                justifyContent: 'center',
+                fontFamily: 'monospace',
+                marginTop: '30px',
+                backgroundColor: 'rgb(119 119 119 / 84%)',
+                padding: '10px',
+                borderRadius: '10px',
               }}
             >
               <ol>
                 <p
                   style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    color: "#fff",
-                    fontWeight: "bold",
+                    display: 'flex',
+                    justifyContent: 'center',
+                    color: '#fff',
+                    fontWeight: 'bold',
                   }}
                 >
                   Links
@@ -108,8 +106,8 @@ export const FinalModalComponent = (props) => {
                 <div>
                   <a
                     style={{
-                      marginTop: "30px",
-                      color: "rgb(91 171 255)",
+                      marginTop: '30px',
+                      color: 'rgb(91 171 255)',
                     }}
                     href="https://patreon.com/bitrix"
                   >
@@ -119,7 +117,7 @@ export const FinalModalComponent = (props) => {
 
                 <div>
                   <a
-                    style={{ marginTop: "10px", color: "rgb(91 171 255)" }}
+                    style={{ marginTop: '10px', color: 'rgb(91 171 255)' }}
                     href="https://www.buymeacoffee.com/bitrix"
                   >
                     ☕ Buy me a coffee :)
@@ -127,14 +125,14 @@ export const FinalModalComponent = (props) => {
                 </div>
 
                 <div>
-                  <p style={{ marginTop: "10px", color: "#fff" }}>
+                  <p style={{ marginTop: '10px', color: '#fff' }}>
                     💸 ETH Address [ERC20] -
                     0x2b2d491559c47406c3d79e0e805f8bfbba699432
                   </p>
                 </div>
 
                 <div>
-                  <p style={{ marginTop: "10px", color: "#fff" }}>
+                  <p style={{ marginTop: '10px', color: '#fff' }}>
                     🦍 Metamask Wallet Address -
                     0xB1Ea4256Af8a6B299e80D0168426545B2A4B2696
                   </p>
@@ -143,18 +141,18 @@ export const FinalModalComponent = (props) => {
             </div>
             <div
               style={{
-                display: "flex",
-                justifyContent: "flex-start",
-                color: "#fff",
-                fontFamily: "monospace",
-                marginTop: "30px",
+                display: 'flex',
+                justifyContent: 'flex-start',
+                color: '#fff',
+                fontFamily: 'monospace',
+                marginTop: '30px',
               }}
             >
               <ol>
-                <p style={{ marginTop: "5px", color: "#fff" }}>
+                <p style={{ marginTop: '5px', color: '#fff' }}>
                   Drop forget to drop me a piece of your collection 😉
                 </p>
-                <p style={{ marginTop: "10px", color: "#fff" }}>
+                <p style={{ marginTop: '10px', color: '#fff' }}>
                   Do tag me as #sickalien in your posts as well , cheers !
                 </p>
               </ol>
@@ -164,4 +162,9 @@ export const FinalModalComponent = (props) => {
       </Modal>
     </div>
   );
+};
+
+FinalModalComponent.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  handleClose: PropTypes.func.isRequired,
 };

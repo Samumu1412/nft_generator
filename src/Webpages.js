@@ -1,20 +1,14 @@
-import React from "react";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  Routes,
-} from "react-router-dom";
-import { Web3ReactProvider } from '@web3-react/core'
-import { Web3Provider } from '@ethersproject/providers'
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Web3ReactProvider } from '@web3-react/core';
+import { Web3Provider } from '@ethersproject/providers';
 
-import { EditingPage } from "./EditingPage/EditingPage";
-import { Error } from "./ErrorPage/Error.js";
-import { Fluidity } from "./LoadingPage/Fluidity";
-import { ThreeData } from "./ThreeDIntro.js/page";
-import "./EditingPage/styles.css";
-import { Selection } from "./SelectionPage/Selection";
+import { EditingPage } from './EditingPage/EditingPage';
+import { Error } from './ErrorPage/Error.js';
+import { Fluidity } from './LoadingPage/Fluidity';
+import { ThreeData } from './ThreeDIntro.js/page';
+import './EditingPage/styles.css';
+import { Selection } from './SelectionPage/Selection';
 
 export const Webpages = () => {
   return (
@@ -31,9 +25,9 @@ export const Webpages = () => {
 };
 
 function getLibrary(provider) {
-  const library = new Web3Provider(provider)
-  library.pollingInterval = 12000
-  return library
+  const library = new Web3Provider(provider);
+  library.pollingInterval = 12000;
+  return library;
 }
 
 function WebPagesWithProvider() {
@@ -41,6 +35,6 @@ function WebPagesWithProvider() {
     <Web3ReactProvider getLibrary={getLibrary}>
       <Webpages />
     </Web3ReactProvider>
-  )
+  );
 }
 export default WebPagesWithProvider;

@@ -1,13 +1,13 @@
-const baseURL = "http://sickalien.store:5000/getFolderTree";
+const baseURL = 'http://sickalien.store:5000/getFolderTree';
 
 export const getTree = async () => {
   const response = await fetch(baseURL, {
-    method: "GET", // *GET, POST, PUT, DELETE, etc.
-    mode: "cors",
+    method: 'GET', // *GET, POST, PUT, DELETE, etc.
+    mode: 'cors',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
-    referrerPolicy: "no-referrer",
+    referrerPolicy: 'no-referrer',
   });
   const data = await response.json();
   return data;
@@ -15,8 +15,8 @@ export const getTree = async () => {
 
 export const getRandomString = (length) => {
   var randomChars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  var result = "";
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var result = '';
   for (var i = 0; i < length; i++) {
     result += randomChars.charAt(
       Math.floor(Math.random() * randomChars.length)

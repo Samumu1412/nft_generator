@@ -1,13 +1,21 @@
-import React from "react";
-import { Rnd } from "react-rnd";
-import { ObjectSelection, ObjectContext } from "./EditingPage";
-import "./Items.css";
+import React, { useContext } from 'react';
+import { Rnd } from 'react-rnd';
+import PropTypes from 'prop-types';
 
-export const Items = (props) => {
-  const { selection, dispatch2 } = React.useContext(ObjectSelection);
-  const { objects, dispatch1 } = React.useContext(ObjectContext);
+import { ObjectContext } from './EditingPage';
+import './Items.css';
 
-  let elements = props.hashedFolder;
+export const Items = ({
+  hashedFolder,
+  imageHeight,
+  imageWidth,
+  parent,
+  onClick,
+  setCoord,
+}) => {
+  const { objects } = useContext(ObjectContext);
+
+  let elements = hashedFolder;
   if (objects && objects.length) {
     elements = objects;
   }
@@ -16,27 +24,26 @@ export const Items = (props) => {
     <div>
       <div
         style={{
-          height: `${props.imageHeight}px`,
-          width: `${props.imageWidth}px`,
-          position: "relative",
+          height: `${imageHeight}px`,
+          width: `${imageWidth}px`,
+          position: 'relative',
         }}
         className="imageDimensions"
-        ref={props.parent}
+        ref={parent}
       >
         {elements &&
-          elements.map((file, index) => (
-            <div onClick={() => props.onClick(`${file.name}`)}>
+          elements.map((file) => (
+            <div key={file.name} onClick={() => onClick(`${file.name}`)}>
               <Rnd
-                key={index}
                 style={{
                   zIndex: file.depth,
                 }}
                 onDragStop={(event) => {
-                  props.setCoord(event, file);
+                  setCoord(event, file);
                 }}
               >
                 <img
-                  src={require(`.${file.path.slice(12).replaceAll("\\", "/")}`)}
+                  src={require(`.${file.path.slice(12).replaceAll('\\', '/')}`)}
                   alt="x"
                   style={{
                     width: file.width,
@@ -50,4 +57,13 @@ export const Items = (props) => {
       </div>
     </div>
   );
+};
+
+Items.propTypes = {
+  hashedFolder: PropTypes.array.isRequired,
+  imageHeight: PropTypes.number.isRequired,
+  imageWidth: PropTypes.number.isRequired,
+  parent: PropTypes.object.isRequired,
+  onClick: PropTypes.func.isRequired,
+  setCoord: PropTypes.func.isRequired,
 };

@@ -13,3 +13,23 @@
 .imageDimensions {
     background-color: rgba(255, 255, 255, 0.24);
 }
+
+.items-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15vh;
+}
+
+.transparent-button{
+    background: transparent;
+    color: white;
+    width: 200px;
+    height: 40px;
+    font-size: 1em;
+    font-family: monospace;
+    border-radius: 5px;
+    margin: auto;
+    transition: .3s;
+    animation: glow 2s ease-in-out infinite alternate;
+  }

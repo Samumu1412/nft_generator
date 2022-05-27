@@ -41,7 +41,8 @@
 }
 
 .rarityText {
-  color: #fff;
+  background-color: #fff;
+  color: black;
   margin: 10px;
 }
 
