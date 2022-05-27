@@ -1,11 +1,11 @@
-import React from "react";
-import Carousel from "react-multi-carousel";
-import "react-multi-carousel/lib/styles.css";
-import { ObjectContext } from "./EditingPage";
-import "./Carousel.css";
+import React, { useContext } from 'react';
+import Carousel from 'react-multi-carousel';
+import 'react-multi-carousel/lib/styles.css';
+import { ObjectContext } from './EditingPage';
+import './Carousel.css';
 
 export const DemoCarousel = () => {
-  const { objects, numberOfCopies } = React.useContext(ObjectContext);
+  const { objects, numberOfCopies } = useContext(ObjectContext);
 
   const responsive = {
     superLargeDesktop: {
@@ -30,35 +30,35 @@ export const DemoCarousel = () => {
     <div>
       <div
         style={{
-          justifyContent: "center",
-          display: "flex",
-          fontWeight: "bold",
-          fontSize: "20px",
-          fontFamily: "Times New Roman, serif",
+          justifyContent: 'center',
+          display: 'flex',
+          fontWeight: 'bold',
+          fontSize: '20px',
+          fontFamily: 'Times New Roman, serif',
         }}
       >
         REVIEW
       </div>
       <div
         style={{
-          justifyContent: "center",
-          display: "flex",
-          fontSize: "20px",
+          justifyContent: 'center',
+          display: 'flex',
+          fontSize: '20px',
           fontWeight: 500,
-          fontFamily: "Times New Roman, serif",
+          fontFamily: 'Times New Roman, serif',
         }}
       >
         Total Copies Generated Will Be :
       </div>
       <div
         style={{
-          justifyContent: "center",
-          display: "flex",
-          fontSize: "25px",
+          justifyContent: 'center',
+          display: 'flex',
+          fontSize: '25px',
           fontWeight: 500,
-          fontFamily: "Times New Roman, serif",
-          animation: "glow 2s ease-in-out infinite alternate",
-          color: "rgba(255, 255, 255, 0.904)",
+          fontFamily: 'Times New Roman, serif',
+          animation: 'glow 2s ease-in-out infinite alternate',
+          color: 'rgba(255, 255, 255, 0.904)',
         }}
       >
         <h1>{`${numberOfCopies.value}`}</h1>
@@ -68,17 +68,17 @@ export const DemoCarousel = () => {
         {objects &&
           objects.map((object) => {
             return (
-              <div className="carouselElement">
+              <div className="carouselElement" key={object.name}>
                 <div>
                   <img
                     src={require(`.${object.path
                       .slice(12)
-                      .replaceAll("\\", "/")}`)}
+                      .replaceAll('\\', '/')}`)}
                     alt="img"
-                    style={{ maxHeight: "20vh" }}
+                    style={{ maxHeight: '20vh' }}
                   />
                 </div>
-                <div style={{ fontWeight: "bold" }}>{`${object.name
+                <div style={{ fontWeight: 'bold' }}>{`${object.name
                   .slice(0, 1)
                   .toUpperCase()}${object.name.slice(1)} : `}</div>
                 <div>{`Height - ${object.height} `}</div>

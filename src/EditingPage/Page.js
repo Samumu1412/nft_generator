@@ -1,22 +1,23 @@
-import React, { useCallback, useContext, useState, useRef } from "react";
-import { forEach, keys, map } from 'lodash'
+import React, { useCallback, useContext, useState, useRef } from 'react';
+import { forEach, keys, map } from 'lodash';
+import PropTypes from 'prop-types';
 
-import { Items } from "./Items";
-import { ObjectContext } from "./EditingPage";
-import { EditorInput } from "./EditorInput";
-import TreesTemp from "./FolderStructure";
-import "./Page.css";
-import { ModalComponent } from "./Modal";
-import { LoadingModalComponent } from "./loadingModal";
-import { RarityModalComponent } from "./RarityModal";
+import { Items } from './Items';
+import { ObjectContext } from './EditingPage';
+import { EditorInput } from './EditorInput';
+import TreesTemp from './FolderStructure';
+import './Page.css';
+import { ModalComponent } from './Modal';
+import { LoadingModalComponent } from './loadingModal';
+import { RarityModalComponent } from './RarityModal';
 
-export const Page = (props) => {
-  const { 
+export const Page = ({ folderStructure, hashedElements }) => {
+  const {
     disPatchObjects,
     selection,
     disPatchSelection,
     disPatchNumberOfCopies,
-    disPatchLayerOrder
+    disPatchLayerOrder,
   } = useContext(ObjectContext);
 
   const [totalCopies, setTotalCopies] = useState(0);
@@ -33,7 +34,7 @@ export const Page = (props) => {
 
   const setCurrentElement = (val) => {
     disPatchSelection({
-      type: "update",
+      type: 'update',
       name: val,
     });
   };
@@ -54,50 +55,53 @@ export const Page = (props) => {
     const curr_Coor = handleMouseOver(event);
 
     disPatchSelection({
-      type: "update",
+      type: 'update',
       name: `${file.name}`,
     });
     disPatchObjects({
-      type: "update",
+      type: 'update',
       nameToFind: selection.name,
-      valueToChange: "x",
+      valueToChange: 'x',
       currentSlide: curr_Coor.x,
     });
     disPatchObjects({
-      type: "update",
+      type: 'update',
       nameToFind: selection.name,
-      valueToChange: "y",
+      valueToChange: 'y',
       currentSlide: curr_Coor.y,
     });
 
     setCoor({ x: curr_Coor.x, y: curr_Coor.y });
   };
 
-  const setValues = useCallback((input) => {
-    console.log('input', input)
-    const inputKeys = keys(input)
-    forEach(inputKeys, (key) => {
-      if(key === 'copyAmount') {
-        setTotalCopies(input[key]);
-        disPatchNumberOfCopies({
-          type: "update",
-          value: input[key]
-        })
-      } else if (key === 'layerOrder') {
-        disPatchLayerOrder({
-          type: "update",
-          value: input[key]
-        })
-      } else {
-        disPatchObjects({
-          type: "update",
-          nameToFind: selection.name,
-          valueToChange: key,
-          currentSlide: input[key],
-        });
-      }
-    })
-  }, [selection]);
+  const setValues = useCallback(
+    (input) => {
+      console.log('input', input);
+      const inputKeys = keys(input);
+      forEach(inputKeys, (key) => {
+        if (key === 'copyAmount') {
+          setTotalCopies(input[key]);
+          disPatchNumberOfCopies({
+            type: 'update',
+            value: input[key],
+          });
+        } else if (key === 'layerOrder') {
+          disPatchLayerOrder({
+            type: 'update',
+            value: input[key],
+          });
+        } else {
+          disPatchObjects({
+            type: 'update',
+            nameToFind: selection.name,
+            valueToChange: key,
+            currentSlide: input[key],
+          });
+        }
+      });
+    },
+    [selection, disPatchLayerOrder, disPatchNumberOfCopies, disPatchObjects]
+  );
 
   const handleOpen = () => {
     setOpen(true);
@@ -123,41 +127,41 @@ export const Page = (props) => {
     <div>
       <div
         style={{
-          width: "15%",
-          float: "left",
-          backgroundColor: "rgb(23, 23, 44)",
-          height: "100vh",
-          padding: "5px",
-          borderRadius: "10px",
-          overflowX: "hidden",
-          overflowY: "auto",
+          width: '15%',
+          float: 'left',
+          backgroundColor: 'rgb(23, 23, 44)',
+          height: '100vh',
+          padding: '5px',
+          borderRadius: '10px',
+          overflowX: 'hidden',
+          overflowY: 'auto',
           zIndex: 20,
-          transition: "width .35s",
+          transition: 'width .35s',
         }}
       >
-        <TreesTemp folderData={props.folderStructure} />
+        <TreesTemp folderData={folderStructure} />
       </div>
       <div
         style={{
-          width: "70%",
-          float: "left",
-          height: "100vh",
-          padding: "5px",
+          width: '70%',
+          float: 'left',
+          height: '100vh',
+          padding: '5px',
         }}
       >
         <div
           style={{
-            display: "flex",
-            justifyContent: "space-between",
-            backgroundColor: "rgba(110, 110, 110, 0.658)",
-            color: "#fff",
-            fontFamily: "monospace",
-            marginTop: "3vh",
-            paddingRight: "5px",
+            display: 'flex',
+            justifyContent: 'space-between',
+            backgroundColor: 'rgba(110, 110, 110, 0.658)',
+            color: '#fff',
+            fontFamily: 'monospace',
+            marginTop: '3vh',
+            paddingRight: '5px',
           }}
         >
           <p>
-            Canvas Height:{" "}
+            Canvas Height:{' '}
             <input
               style={{ width: 40 }}
               onChange={(event) => {
@@ -166,7 +170,7 @@ export const Page = (props) => {
                 });
               }}
             />
-            &nbsp; px &nbsp;Canvas Width:{" "}
+            &nbsp; px &nbsp;Canvas Width:{' '}
             <input
               style={{ width: 40 }}
               onChange={(event) => {
@@ -185,8 +189,8 @@ export const Page = (props) => {
         <div className="items-container">
           <Items
             onClick={setCurrentElement}
-            files={props.folderStructure}
-            hashedFolder={props.hashedElements}
+            files={folderStructure}
+            hashedFolder={hashedElements}
             imageHeight={canvasHeight.value}
             imageWidth={canvasWidth.value}
             setCoord={setCoord}
@@ -196,45 +200,45 @@ export const Page = (props) => {
       </div>
       <div
         style={{
-          width: "15%",
-          float: "right",
-          borderRadius: "10px",
+          width: '15%',
+          float: 'right',
+          borderRadius: '10px',
           zIndex: 20,
-          marginTop: "10px",
+          marginTop: '10px',
         }}
       >
         <div
           style={{
-            backgroundColor: "rgb(23, 23, 44)",
-            height: "100vh",
-            margin: "5px 0px 5px 5px ",
-            padding: "5px",
+            backgroundColor: 'rgb(23, 23, 44)',
+            height: '100vh',
+            margin: '5px 0px 5px 5px ',
+            padding: '5px',
             boxShadow:
-              "-5px 2px 4px -1px rgb(0 0 0 / 20%), -5px 4px 5px 0px rgb(0 0 0 / 14%), -5px 1px 10px 0px rgb(0 0 0 / 12%)",
+              '-5px 2px 4px -1px rgb(0 0 0 / 20%), -5px 4px 5px 0px rgb(0 0 0 / 14%), -5px 1px 10px 0px rgb(0 0 0 / 12%)',
           }}
         >
           <div>
-            <EditorInput setValues={setValues} layers={map(props.hashedElements, 'name')}/>
+            <EditorInput
+              setValues={setValues}
+              layers={map(hashedElements, 'name')}
+            />
           </div>
           <div
             style={{
-              marginTop: "15px",
-              padding: "5px",
+              marginTop: '15px',
+              padding: '5px',
             }}
           >
-            <div style={{ justifyContent: "center", display: "flex" }}>
-              <button
-                className="transparent-button"
-                onClick={handleRarityOpen}
-              >
+            <div style={{ justifyContent: 'center', display: 'flex' }}>
+              <button className="transparent-button" onClick={handleRarityOpen}>
                 Add Rarity
               </button>
             </div>
             <div
               style={{
-                justifyContent: "center",
-                display: "flex",
-                marginTop: "15px",
+                justifyContent: 'center',
+                display: 'flex',
+                marginTop: '15px',
               }}
             >
               <button
@@ -250,7 +254,7 @@ export const Page = (props) => {
               <RarityModalComponent
                 isOpen={rarityOpen}
                 handleClose={handleRarityClose}
-                folderStructure={props.folderStructure}
+                folderStructure={folderStructure}
               />
             </div>
 
@@ -271,4 +275,9 @@ export const Page = (props) => {
       </div>
     </div>
   );
+};
+
+Page.propTypes = {
+  folderStructure: PropTypes.object,
+  hashedElements: PropTypes.array.isRequired,
 };

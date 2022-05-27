@@ -1,30 +1,30 @@
-import React, { useState, useContext, useEffect } from "react";
-import Slider from "@material-ui/core/Slider";
-import { ObjectContext } from "./EditingPage";
-import "./Slider.css";
+import React, { useState, useContext, useEffect } from 'react';
+import { Slider } from '@material-ui/core';
+import { ObjectContext } from './EditingPage';
+import './Slider.css';
+import PropTypes from 'prop-types';
 
-export const SliderComponent = (props) => {
-  const [currentSlide, setCurrentSlide] = useState(props.value);
+export const SliderComponent = ({ value, name, marks }) => {
+  const [currentSlide, setCurrentSlide] = useState(value);
   const { disPatchObjects, selection } = useContext(ObjectContext);
 
-  const valueToChange = props.name;
-
+  const valueToChange = name;
 
   useEffect(() => {
-    setCurrentSlide(props.value);
-  }, [props.value]);
+    setCurrentSlide(value);
+  }, [value]);
 
   const changeValue = (event, newValue) => {
     setCurrentSlide(newValue);
     disPatchObjects({
-      type: "update",
+      type: 'update',
       nameToFind: selection.name,
       valueToChange: valueToChange,
       currentSlide: currentSlide,
     });
   };
 
-  return !props.marks ? (
+  return !marks ? (
     <Slider
       value={currentSlide}
       valueLabelDisplay="auto"
@@ -45,4 +45,10 @@ export const SliderComponent = (props) => {
       max={10}
     />
   );
+};
+
+SliderComponent.propTypes = {
+  value: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  marks: PropTypes.bool.isRequired,
 };

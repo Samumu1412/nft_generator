@@ -36,7 +36,7 @@
     "node-sass": "^7.0.1",
     "nodemon": "^2.0.15",
     "ora": "^5.4.1",
-    "prop-types": "^15.6.2",
+    "prop-types": "^15.8.1",
     "raf": "latest",
     "random": "2.0.13",
     "react": "^17.0.2",
@@ -57,6 +57,8 @@
     "server": "node server.js",
     "dev": "export PORT=2095 && react-scripts start",
     "prod": "export PORT=80 && react-scripts start",
+    "eslint": "eslint ./src",
+    "eslint-fix": "eslint --fix ./src",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -80,5 +82,17 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.30.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-jest": "^24.3.6",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "prettier": "^2.3.2",
+    "react-error-overlay": "6.0.9"
   }
 }

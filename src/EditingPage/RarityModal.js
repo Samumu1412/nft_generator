@@ -1,62 +1,65 @@
-import * as React from "react";
-import { Backdrop } from "@material-ui/core";
-import { Box } from "@material-ui/core";
-import { Modal } from "@material-ui/core";
-import { Fade, Button } from "@material-ui/core";
-import TreesTempRarity from "./FolderStructureRarity";
-import "../style.css"
+import * as React from 'react';
+import { Backdrop, Box, Modal, Fade } from '@material-ui/core';
+import PropTypes from 'prop-types';
+
+import TreesTempRarity from './FolderStructureRarity';
+import '../style.css';
 
 const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
   width: 1000,
   height: 650,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
   boxShadow: 24,
-  borderRadius: "10px",
+  borderRadius: '10px',
   p: 4,
-  backgroundColor: "#525050d7",
+  backgroundColor: '#525050d7',
 };
 
-export const RarityModalComponent = (props) => {
+export const RarityModalComponent = ({
+  isOpen,
+  handleClose,
+  folderStructure,
+}) => {
   return (
     <div>
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
-        open={props.isOpen}
-        onClose={props.handleClose}
+        open={isOpen}
+        onClose={handleClose}
         closeAfterTransition
         BackdropComponent={Backdrop}
         BackdropProps={{
           timeout: 500,
         }}
       >
-        <Fade in={props.isOpen}>
+        <Fade in={isOpen}>
           <Box sx={style}>
             <div
               style={{
-                overflowX: "hidden",
-                overflowY: "auto",
-                maxHeight: "550px",
+                overflowX: 'hidden',
+                overflowY: 'auto',
+                maxHeight: '550px',
               }}
             >
-              <TreesTempRarity folderData={props.folderStructure} />
+              <TreesTempRarity folderData={folderStructure} />
             </div>
 
             <div
               style={{
-                justifyContent: "center",
-                display: "flex",
+                justifyContent: 'center',
+                display: 'flex',
               }}
             >
               <button
                 className="transparent-button"
                 style={{ margin: 10 }}
-                onClick={props.handleClose}
+                onClick={handleClose}
               >
                 Submit
               </button>
@@ -66,4 +69,10 @@ export const RarityModalComponent = (props) => {
       </Modal>
     </div>
   );
+};
+
+RarityModalComponent.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  handleClose: PropTypes.func.isRequired,
+  folderStructure: PropTypes.object,
 };

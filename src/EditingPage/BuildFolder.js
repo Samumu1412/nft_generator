@@ -1,26 +1,21 @@
-import React, { Component } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemText from "@material-ui/core/ListItemText";
-import { ObjectContext } from "./EditingPage";
-import { useTheme } from "@material-ui/core/styles";
-import { TreeView } from "@material-ui/lab";
-import TreeItem from "@material-ui/lab/TreeItem";
-import { Typography } from "@material-ui/core";
-import "./buildFolder.css";
+import React, { useContext } from 'react';
+import ListItem from '@material-ui/core/ListItem';
+import { ObjectContext } from './EditingPage';
+import TreeItem from '@material-ui/lab/TreeItem';
+import { Typography } from '@material-ui/core';
+import PropTypes from 'prop-types';
 
-export const Folders = (props) => {
-  const { objects, disPatchObjects } = React.useContext(ObjectContext);
-  const children = props.children;
-  let folderStructure = [];
+import './buildFolder.css';
+
+export const Folders = ({ treeChildren }) => {
+  const { disPatchObjects } = useContext(ObjectContext);
 
   const handleClick = (folder, subfolder) => {
     //console.log(objects, "folder: ", folder, subfolder, "index: ", index);
     disPatchObjects({
-      type: "update",
+      type: 'update',
       nameToFind: folder,
-      valueToChange: "path",
+      valueToChange: 'path',
       currentSlide: subfolder.path.slice(3),
     });
   };
@@ -29,30 +24,33 @@ export const Folders = (props) => {
 
   return (
     <div>
-      {children &&
-        children.map((folder, index1) => (
-          <div>
-            <ListItem key={index1} button component="a" href="#">
+      {treeChildren &&
+        treeChildren.map((folder) => (
+          <div key={folder.name}>
+            <ListItem button component="a" href="#">
               <Typography
                 className="element"
                 // eslint-disable-next-line react/jsx-no-duplicate-props
                 style={{
-                  fontWeight: "bold",
-                  fontFamily: "monospace",
-                  backgroundColor: "#102841"
+                  fontWeight: 'bold',
+                  fontFamily: 'monospace',
+                  backgroundColor: '#102841',
                 }}
               >
                 {folder.name.slice(0, 1).toUpperCase() + folder.name.slice(1)}
               </Typography>
             </ListItem>
 
-            {folder.children.map((subfolder, index2) => (
-              <div onClick={() => handleClick(folder.name, subfolder)}>
-                <ListItem key={index2} button component="a" href="#">
+            {folder.children.map((subfolder) => (
+              <div
+                onClick={() => handleClick(folder.name, subfolder)}
+                key={subfolder.name}
+              >
+                <ListItem button component="a" href="#">
                   <Typography
                     className="elementSubfolder"
                     style={{
-                      fontFamily: "monospace",
+                      fontFamily: 'monospace',
                     }}
                   >
                     {subfolder.name}
@@ -63,9 +61,9 @@ export const Folders = (props) => {
             <TreeItem
               nodeId="1"
               label={
-                <ListItem root component="a" href="#">
-                  <Typography styles={{ backgroundColor: "#034b92" }}>
-                    {" "}
+                <ListItem root="true" component="a" href="#">
+                  <Typography styles={{ backgroundColor: '#034b92' }}>
+                    {' '}
                   </Typography>
                 </ListItem>
               }
@@ -74,4 +72,8 @@ export const Folders = (props) => {
         ))}
     </div>
   );
+};
+
+Folders.propTypes = {
+  treeChildren: PropTypes.array,
 };
