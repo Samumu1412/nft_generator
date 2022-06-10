@@ -1,4 +1,11 @@
+#!/usr/bin/env node
+
+//TODO
+//CHECK FOR TRAILING SLASHES ON ALL INPUTS
+
 //IMPORTS
+const chalk = require('chalk');
+const boxen = require('boxen');
 const ora = require('ora');
 const inquirer = require('inquirer');
 const fs = require('fs');
@@ -38,6 +45,24 @@ const getDirectories = source =>
 const sleep = seconds => new Promise(resolve => setTimeout(resolve, seconds * 1000))
 
 //OPENING
+console.log(
+  boxen(
+    chalk.blue(
+      ' /$$   /$$ /$$$$$$$$ /$$$$$$$$        /$$$$$$  /$$$$$$$  /$$$$$$$$        /$$$$$$  /$$$$$$$$ /$$   /$$ /$$$$$$$$ /$$$$$$$   /$$$$$$  /$$$$$$$$ /$$$$$$  /$$$$$$$ \n' +
+        '| $$$ | $$| $$_____/|__  $$__/       /$$__  $$| $$__  $$|__  $$__/       /$$__  $$| $$_____/| $$$ | $$| $$_____/| $$__  $$ /$$__  $$|__  $$__//$$__  $$| $$__  $$\n' +
+        '| $$$$| $$| $$         | $$         | $$  \\ $$| $$  \\ $$   | $$         | $$  \\__/| $$      | $$$$| $$| $$      | $$  \\ $$| $$  \\ $$   | $$  | $$  \\ $$| $$  \\ $$\n' +
+        '| $$ $$ $$| $$$$$      | $$         | $$$$$$$$| $$$$$$$/   | $$         | $$ /$$$$| $$$$$   | $$ $$ $$| $$$$$   | $$$$$$$/| $$$$$$$$   | $$  | $$  | $$| $$$$$$$/\n' +
+        '| $$  $$$$| $$__/      | $$         | $$__  $$| $$__  $$   | $$         | $$|_  $$| $$__/   | $$  $$$$| $$__/   | $$__  $$| $$__  $$   | $$  | $$  | $$| $$__  $$\n' +
+        '| $$\\  $$$| $$         | $$         | $$  | $$| $$  \\ $$   | $$         | $$  \\ $$| $$      | $$\\  $$$| $$      | $$  \\ $$| $$  | $$   | $$  | $$  | $$| $$  \\ $$\n' +
+        '| $$ \\  $$| $$         | $$         | $$  | $$| $$  | $$   | $$         |  $$$$$$/| $$$$$$$$| $$ \\  $$| $$$$$$$$| $$  | $$| $$  | $$   | $$  |  $$$$$$/| $$  | $$\n' +
+        '|__/  \\__/|__/         |__/         |__/  |__/|__/  |__/   |__/          \\______/ |________/|__/  \\__/|________/|__/  |__/|__/  |__/   |__/   \\______/ |__/  |__/\n \n' +
+        'Made with '
+    ) +
+      chalk.red('❤') +
+      chalk.blue(' by NotLuksus'),
+    { borderColor: 'red', padding: 3 }
+  )
+);
 
 main();
 
@@ -50,38 +75,21 @@ async function main() {
   }
 
   await loadConfig("config.json");
-  
-  //await getBasePath();
-  basePath = process.cwd() + `/${tree.path}`
-  //await getOutputPath();
-  outputPath = process.cwd() + `/generated/${uuid}`
-  //await checkForDuplicates();
-  config.deleteDuplicates = true
-
-  //await generateMetadataPrompt();
-  config.generateMetadata = true
-
+  await getBasePath();
+  await getOutputPath();
+  await checkForDuplicates();
+  await generateMetadataPrompt();
   if (config.generateMetadata) {
-    //await metadataSettings();
+    await metadataSettings();
   }
-  config.metaData.name = data.name;
-  config.metaData.description = data.description;
-  config.metaData.splitFiles = false;
-
-  let lastChar = data.URL.slice(-1);
-  if (lastChar === '/') config.imageUrl = data.URL;
-  else config.imageUrl = data.URL + '/';
-
   const loadingDirectories = ora('Loading traits');
   loadingDirectories.color = 'yellow';
   loadingDirectories.start();
-
   traits = getDirectories(basePath);
   traitsToSort = [...traits];
   await sleep(2);
   loadingDirectories.succeed();
   loadingDirectories.clear();
-  
   await traitsOrder(true);
   await customNamesPrompt();
   await asyncForEach(traits, async trait => {
@@ -123,7 +131,6 @@ async function getBasePath() {
     basePath = config.basePath;
     return;
   }
-
   const { base_path } = await inquirer.prompt([
     {
       type: 'list',
@@ -338,6 +345,7 @@ async function setWeights(trait) {
   files.forEach((file, i) => {
     weights[file] = selectedWeights[names[file] + '_weight'];
   });
+  console.log(weights)
   config.weights = weights;
 }
 

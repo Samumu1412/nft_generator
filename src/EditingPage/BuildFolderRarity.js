@@ -34,7 +34,7 @@ export const FoldersRarity = ({ treeChildren }) => {
               </Typography>
             </ListItem>
 
-            {folder.treeChildren.map((subfolder, index2) => (
+            {folder.children.map((subfolder, index2) => (
               <div key={subfolder.name}>
                 <ListItem button component="a" href="#">
                   <img

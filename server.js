@@ -154,6 +154,7 @@ const sleep = seconds => new Promise(resolve => setTimeout(resolve, seconds * 10
 app.post("/submitDetails", async (request, response) => {
   const data = request.body;
   console.log('data', data)
+  console.log(data.folderTree.children[0].children)
 
   basePath = process.cwd() + `/${data.folderTree.path}/`
   outputPath = process.cwd() + `/generated/${data.uuid}/`
@@ -177,9 +178,10 @@ app.post("/submitDetails", async (request, response) => {
   loadingDirectories.succeed();
   loadingDirectories.clear();
   console.log('config1: ', config)
-  config.order = data.order
-  config.weights = data.weights
+  config.order = data.layerOrder
 
+  setWeights()
+  
   console.log('config2: ', config)
   const generatingImages = ora('Generating images');
   generatingImages.color = 'yellow';
@@ -188,6 +190,8 @@ app.post("/submitDetails", async (request, response) => {
   await sleep(2);
   generatingImages.succeed('All images generated!');
   generatingImages.clear();
+
+  /*
   if (config.generateMetadata) {
     const writingMetadata = ora('Exporting metadata');
     writingMetadata.color = 'yellow';
@@ -197,13 +201,9 @@ app.post("/submitDetails", async (request, response) => {
     writingMetadata.succeed('Exported metadata successfully');
     writingMetadata.clear();
   }
+  */
 
 
-  //console.log("The total Time Taken was : ", seconds);
-  //const totalUsers = db.get("TotalUsers").value() + 1;
-  //const totalItems = db.get("TotalItems").value();
-  //db.set("TotalUsers", totalUsers).write();
-  //db.set("TotalItems", data.total.value + totalItems).write();
 });
 
 app.get("/compress", (req, res) => {
@@ -290,50 +290,7 @@ async function traitsOrder(isFirst) {
   await traitsOrder(false);
 }
 
-//SELECT IF WE WANT TO SET CUSTOM NAMES FOR EVERY TRAITS OR USE FILENAMES
-async function customNamesPrompt() {
-    if (config.useCustomNames !== null) return;
-    let { useCustomNames } = await inquirer.prompt([
-      {
-        type: 'list',
-        name: 'useCustomNames',
-        message: 'How should be constructed the names of the traits?',
-        choices: [
-          { name: 'Use filenames as traits names', value: 0 },
-          { name: 'Choose custom names for each trait', value: 1 },
-        ],
-      },
-    ]);
-    config.useCustomNames = useCustomNames;
-}
 
-//SET NAMES FOR EVERY TRAIT
-async function setNames(trait) {
-  if (config.useCustomNames) {
-    names = config.names || names;
-    const files = await getFilesForTrait(trait);
-    const namePrompt = [];
-    files.forEach((file, i) => {
-      if (config.names && config.names[file] !== undefined) return;
-      namePrompt.push({
-        type: 'input',
-        name: trait + '_name_' + i,
-        message: 'What should be the name of the trait shown in ' + file + '?',
-      });
-    });
-    const selectedNames = await inquirer.prompt(namePrompt);
-    files.forEach((file, i) => {
-      if (config.names && config.names[file] !== undefined) return;
-      names[file] = selectedNames[trait + '_name_' + i];
-    });
-    config.names = {...config.names, ...names};
-  } else {
-    const files = fs.readdirSync(basePath + '/' + trait);
-    files.forEach((file, i) => {
-      names[file] = file.split('.')[0];
-    });
-  }
-}
 
 //SET WEIGHTS FOR EVERY TRAIT
 async function setWeights(trait) {
@@ -342,16 +299,10 @@ async function setWeights(trait) {
     return;
   }
   const files = await getFilesForTrait(trait);
-  const weightPrompt = [];
+  console.log(names)
   files.forEach((file, i) => {
-    weightPrompt.push({
-      type: 'input',
-      name: names[file] + '_weight',
-      message: 'How many ' + names[file] + ' ' + trait + ' should there be?',
-      default: parseInt(Math.round(10000 / files.length)),
-    });
+    console.log(file)
   });
-  const selectedWeights = await inquirer.prompt(weightPrompt);
   files.forEach((file, i) => {
     weights[file] = selectedWeights[names[file] + '_weight'];
   });
