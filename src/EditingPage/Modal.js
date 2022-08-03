@@ -42,6 +42,7 @@ export const ModalComponent = ({
   const [description, setDescription] = useState('');
   const [URL, setURL] = useState('');
   const [next, setNext] = useState(false);
+  console.log('layerOrder', layerOrder.value)
 
   const handleClick = () => {
     const data = {
@@ -54,8 +55,9 @@ export const ModalComponent = ({
       name: name,
       description: description,
       URL: URL,
-      layerOrder,
+      layerOrder: layerOrder.value,
     };
+    console.log('data', data)
     openLoadingModal();
     axios
       .post('http://localhost:8443/submitDetails', data)
